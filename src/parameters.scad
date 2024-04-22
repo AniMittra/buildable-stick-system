@@ -34,12 +34,12 @@ lever_plate_hole = 12;
 
 // case dimensions
 // base frame box. reminder: top of inside (including mounts) is chopped by panel_z for plates
-frame_x = 208;
+frame_x = 168;
 frame_y = 208;
 frame_z = 50;
 
 // middle piece dimensions
-mid_frame_x = 118;
+mid_frame_x = 83;
 
 /*
 frame_x = 233;
