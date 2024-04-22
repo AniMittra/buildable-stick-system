@@ -24,6 +24,19 @@ module panel_holes() {
 	translate([-panel_to_frame_point_x, -panel_to_frame_point_y, 2]) m4_hole_countersink();
 }
 
+module mid_panel_holes() {
+	// holes for mount bolts
+	translate([mid_panel_to_frame_point_x, panel_to_frame_point_y, 0]) m4_hole();
+	translate([mid_panel_to_frame_point_x, -panel_to_frame_point_y, 0]) m4_hole();
+	translate([-mid_panel_to_frame_point_x, panel_to_frame_point_y, 0]) m4_hole();
+	translate([-mid_panel_to_frame_point_x, -panel_to_frame_point_y, 0]) m4_hole();
+	// holes for mount bolt countersinks
+	translate([mid_panel_to_frame_point_x, panel_to_frame_point_y, 2]) m4_hole_countersink();
+	translate([mid_panel_to_frame_point_x, -panel_to_frame_point_y, 2]) m4_hole_countersink();
+	translate([-mid_panel_to_frame_point_x, panel_to_frame_point_y, 2]) m4_hole_countersink();
+	translate([-mid_panel_to_frame_point_x, -panel_to_frame_point_y, 2]) m4_hole_countersink();
+}
+
 // button hole, with extra wide bits for various uses (cutting out space
 // for snap-ins, etc.
 module button_24mm_hole() {
@@ -167,6 +180,10 @@ module base_panel() {
 	cube([panel_x, panel_y, panel_z], center=true);
 }
 
+module middle_base_panel() {
+	cube([mid_panel_x, panel_y, panel_z], center=true);
+}
+
 module base_bottom_panel() {
 	mirror([0, 0, 1]) base_panel();
 }
@@ -210,6 +227,31 @@ module overhang_plate() {
 	}
 }
 
+module mid_overhang_plate() {
+	top_points = [
+		// top bevel
+		[(mid_overhang_panel_x/2)-(overhang_panel_bevel_height*2),
+		 (overhang_panel_y/2)-(overhang_panel_bevel_height*2),
+		 panel_z/2-overhang_panel_bevel_height/2],
+		[-(mid_overhang_panel_x/2)+(overhang_panel_bevel_height*2),
+		 (overhang_panel_y/2)-(overhang_panel_bevel_height*2),
+		 panel_z/2-overhang_panel_bevel_height/2],
+		[(mid_overhang_panel_x/2)-(overhang_panel_bevel_height*2),
+		 -(overhang_panel_y/2)+(overhang_panel_bevel_height*2),
+		 panel_z/2-overhang_panel_bevel_height/2],
+		[-(mid_overhang_panel_x/2)+(overhang_panel_bevel_height*2),
+		 -(overhang_panel_y/2)+(overhang_panel_bevel_height*2),
+		 panel_z/2-overhang_panel_bevel_height/2],
+	];
+	hull() {
+		for (p = top_points) {
+			translate(p) cylinder(r=overhang_panel_bevel_height, h=overhang_panel_bevel_height, center=true);
+		}
+		translate([0, 0, -overhang_panel_bevel_height])
+			cube([mid_overhang_panel_x, overhang_panel_y, panel_z-overhang_panel_bevel_height*2], center=true);
+	}
+}
+
 // this takes the base_panel and makes it a small frame, putting a larger top plate
 module base_panel_with_raised_overhang() {
 	// make a frame out of the top plate (and keep the main plate on the center plane)
@@ -228,12 +270,38 @@ module base_panel_with_raised_overhang() {
 	overhang_plate();
 }
 
+// this takes the base_panel and makes it a small frame, putting a larger top plate
+module middle_base_panel_with_raised_overhang() {
+	// make a frame out of the top plate (and keep the main plate on the center plane)
+	translate([0, 0, -5]) difference() {
+		middle_base_panel();
+		cube([mid_panel_x-(panel_support_width*2), panel_y-(panel_support_width*2), panel_z], center=true);
+	}
+	translate([mid_panel_to_frame_point_x, panel_to_frame_point_y, -2.5]) resize([0, 0, 10])
+		frame_mount_column();
+	translate([-(mid_panel_to_frame_point_x), panel_to_frame_point_y, -2.5]) resize([0, 0, 10])
+		rotate([0, 0, 90]) frame_mount_column();
+	translate([mid_panel_to_frame_point_x, -(panel_to_frame_point_y), -2.5]) resize([0, 0, 10])
+		rotate([0, 0, 270]) frame_mount_column();
+	translate([-(mid_panel_to_frame_point_x), -(panel_to_frame_point_y), -2.5]) resize([0, 0, 10])
+		rotate([0, 0, 180]) frame_mount_column();
+	mid_overhang_plate();
+}
+
 module panel_with_raised_overhang() {
 	difference() {
 		base_panel_with_raised_overhang();
 		panel_holes();
 	}
 }
+
+module middle_panel_with_raised_overhang() {
+	difference() {
+		middle_base_panel_with_raised_overhang();
+		mid_panel_holes();
+	}
+}
+
 
 module frame_box() {
 	difference() {
@@ -290,6 +358,61 @@ module frame_box() {
 	}
 }
 
+module mid_frame_box() {
+	difference() {
+		top_points = [
+			// top bevel
+			[(mid_frame_x/2)-(frame_bevel_height*2),
+			 (frame_y/2)-(frame_bevel_height*2),
+			 frame_z/2-frame_bevel_height/2],
+			[-(mid_frame_x/2)+(frame_bevel_height*2),
+			 (frame_y/2)-(frame_bevel_height*2),
+			 frame_z/2-frame_bevel_height/2],
+			[(mid_frame_x/2)-(frame_bevel_height*2),
+			 -(frame_y/2)+(frame_bevel_height*2),
+			 frame_z/2-frame_bevel_height/2],
+			[-(mid_frame_x/2)+(frame_bevel_height*2),
+			 -(frame_y/2)+(frame_bevel_height*2),
+			 frame_z/2-frame_bevel_height/2],
+		];
+		base_points = [
+			// majority of shape
+			[(mid_frame_x/2)-frame_bevel_height, (frame_y/2)-frame_bevel_height, 0],
+			[-(mid_frame_x/2)+frame_bevel_height, (frame_y/2)-frame_bevel_height, 0],
+			[(mid_frame_x/2)-frame_bevel_height, -(frame_y/2)+frame_bevel_height, 0],
+			[-(mid_frame_x/2)+frame_bevel_height, -(frame_y/2)+frame_bevel_height, 0],
+		];
+		bottom_points = [
+			// bottom bevel
+			[(mid_frame_x/2)-(frame_bevel_height*2),
+			 (frame_y/2)-(frame_bevel_height*2),
+			 -frame_z/2+frame_bevel_height/2],
+			[-(mid_frame_x/2)+(frame_bevel_height*2),
+			 (frame_y/2)-(frame_bevel_height*2),
+			 -frame_z/2+frame_bevel_height/2],
+			[(mid_frame_x/2)-(frame_bevel_height*2),
+			 -(frame_y/2)+(frame_bevel_height*2),
+			 -frame_z/2+frame_bevel_height/2],
+			[-(mid_frame_x/2)+(frame_bevel_height*2),
+			 -(frame_y/2)+(frame_bevel_height*2),
+			 -frame_z/2+frame_bevel_height/2],
+		];
+		hull() {
+			for (p = top_points) {
+				translate(p) cylinder(r=2, h=frame_bevel_height, center=true);
+			}
+			for (p = base_points) {
+				translate(p) cylinder(r=2, h=frame_z-(frame_bevel_height*2), center=true);
+			}
+			for (p = bottom_points) {
+				translate(p) cylinder(r=2, h=frame_bevel_height, center=true);
+			}
+		}
+		// cut out the middle to make it a box
+		cube([mid_panel_x-(panel_support_width*2), panel_y-(panel_support_width*2), frame_z+5], center=true);
+	}
+}
+
 module frame_mount_column() {
 	cube([frame_mount_column_width, frame_mount_column_width, frame_z], center=true);
 	// add some corners back to do a lame chamfer
@@ -299,6 +422,11 @@ module frame_mount_column() {
 
 module side_chopper() {
 	translate([(frame_x-frame_wall)/2+panel_overhang_amount, 0, 0])
+		cube([frame_wall+panel_overhang_amount*2, overhang_panel_y, frame_z], center=true);
+}
+
+module mid_side_chopper() {
+	translate([(mid_frame_x-frame_wall)/2+panel_overhang_amount, 0, 0])
 		cube([frame_wall+panel_overhang_amount*2, overhang_panel_y, frame_z], center=true);
 }
 
@@ -326,6 +454,14 @@ module base_frame() {
 	translate([panel_to_frame_point_x, -(panel_to_frame_point_y), 0]) rotate([0, 0, 270])  frame_mount_column();
 }
 
+module base_mid_frame() {
+	mid_frame_box();
+	translate([mid_panel_to_frame_point_x, panel_to_frame_point_y, 0]) frame_mount_column();
+	translate([-mid_panel_to_frame_point_x, panel_to_frame_point_y, 0]) rotate([0, 0, 90]) frame_mount_column();
+	translate([-mid_panel_to_frame_point_x, -(panel_to_frame_point_y), 0]) rotate([0, 0, 180])  frame_mount_column();
+	translate([mid_panel_to_frame_point_x, -(panel_to_frame_point_y), 0]) rotate([0, 0, 270])  frame_mount_column();
+}
+
 module frame() {
 	difference() {
 		base_frame();
@@ -335,6 +471,18 @@ module frame() {
 		translate([-panel_to_frame_point_x, panel_to_frame_point_y, 0]) frame_hex_bolt_hole();
 		translate([panel_to_frame_point_x, -panel_to_frame_point_y, 0]) frame_hex_bolt_hole();
 		translate([-panel_to_frame_point_x, -panel_to_frame_point_y, 0]) frame_hex_bolt_hole();
+	}
+}
+
+module mid_frame() {
+	difference() {
+		base_mid_frame();
+		translate([0, 0, frame_z/2]) scale([1, 1, 2]) base_panel();
+		translate([0, 0, -frame_z/2]) scale([1, 1, 2]) bottom_panel();
+		translate([mid_panel_to_frame_point_x, panel_to_frame_point_y, 0]) frame_hex_bolt_hole();
+		translate([-mid_panel_to_frame_point_x, panel_to_frame_point_y, 0]) frame_hex_bolt_hole();
+		translate([mid_panel_to_frame_point_x, -panel_to_frame_point_y, 0]) frame_hex_bolt_hole();
+		translate([-mid_panel_to_frame_point_x, -panel_to_frame_point_y, 0]) frame_hex_bolt_hole();
 	}
 }
 

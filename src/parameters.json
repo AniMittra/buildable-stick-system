@@ -1,0 +1,29 @@
+{
+    "fileFormatVersion": "1",
+    "parameterSets": {
+        "3 piece design": {
+            "decorative_radius_scale": "1.75",
+            "frame_bevel_height": "2",
+            "frame_center_to_neutrik": "70",
+            "frame_extension_x": "25",
+            "frame_extension_y": "25",
+            "frame_mount_column_width": "20",
+            "frame_wall": "4",
+            "frame_y": "208",
+            "frame_z": "57",
+            "hole_tolerance": "0.14999999999999999",
+            "jumbo_decorative_radius_scale": "2",
+            "lever_mount_x": "53",
+            "lever_mount_y": "95",
+            "lever_mount_z": "2",
+            "lever_plate_hole": "12",
+            "m2_screw_selftap_radius": "0.94999999999999996",
+            "m3_screw_selftap_radius": "1.3",
+            "neutrik_panel_thickness": "3",
+            "overhang_panel_bevel_height": "1",
+            "panel_overhang_amount": "8.5",
+            "panel_support_width": "5",
+            "panel_z": "5"
+        }
+    }
+}

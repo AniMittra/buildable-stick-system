@@ -31,11 +31,23 @@ lever_mount_z = 2;
 // standard lever hole
 lever_plate_hole = 12;
 
+
 // case dimensions
 // base frame box. reminder: top of inside (including mounts) is chopped by panel_z for plates
+frame_x = 208;
+frame_y = 208;
+frame_z = 50;
+
+// middle piece dimensions
+mid_frame_x = 118;
+
+/*
 frame_x = 233;
 frame_y = 208;
 frame_z = 57;
+*/
+
+
 
 // degree to which the extended frame pieces stick out from the end of the frame
 frame_extension_x = 25;
@@ -61,15 +73,22 @@ neutrik_panel_thickness = 3;
 panel_x = frame_x - (frame_wall * 2);
 panel_y = frame_y - (frame_wall * 2);
 panel_z = 5;
+mid_panel_x = mid_frame_x - (frame_wall * 2);
+
 
 // how much the top plate x/y is expanded to overhang the frame
 // note that this is relative to the top plate (so the wall is added back)
 panel_overhang_amount = 8.5;
 overhang_panel_x = panel_x + (frame_wall * 2) + (panel_overhang_amount * 2);
 overhang_panel_y = panel_y + (frame_wall * 2) + (panel_overhang_amount * 2);
+// mid overhang
+mid_overhang_panel_x = mid_panel_x + (frame_wall * 2) + (panel_overhang_amount * 2);
+
 
 panel_to_frame_point_x = (panel_x/2)-10;
 panel_to_frame_point_y = (panel_y/2)-10;
+mid_panel_to_frame_point_x = (mid_panel_x/2)-10;
+
 
 // frame interior that supports the top plates
 panel_support_width = 5;
