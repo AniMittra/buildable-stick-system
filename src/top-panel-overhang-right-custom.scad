@@ -9,7 +9,7 @@ use <top-panel-overhang-right-sega-2p-plus-one.scad>
 
 module top_panel_right_custom() {
 	top_panel_right_sega_2p_plus_one();
-	translate([30, -50, -(panel_z/2) - 3]) pcb_mount();
+	//translate([30, -50, -(panel_z/2) - 3]) pcb_mount();
 }
 
 top_panel_right_custom();

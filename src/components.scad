@@ -123,6 +123,18 @@ module oled_ssd1306_mount_cutout() {
 	translate([0, 0, -1.0]) cube([35, 35, 4], center=true);
 }
 
+module oled_sh1106_mount() {
+	translate([30.4/2, 28.5/2, 0]) m2_mount_post();
+	translate([30.4/2, -28.5/2, 0]) m2_mount_post();
+	translate([-30.4/2, 28.5/2, 0]) m2_mount_post();
+	translate([-30.4/2, -28.5/2, 0]) m2_mount_post();
+}
+
+module oled_sh1106_mount_cutout() {
+	translate([0, 1.9, 0]) cube([29.42, 14.7, 5], center=true);
+	translate([0, 0, -4.0]) cube([36, 34, 10], center=true);
+}
+
 module m3_mount_post() {
 	difference() {
 		cylinder(r=m3_screw_selftap_radius*4, h=8, $fn=6, center=true);

@@ -23,6 +23,9 @@ small_button_radius = 12 + hole_tolerance;
 // 30mm button
 big_button_radius = 15 + hole_tolerance;
 
+// switch plate offset from corners of frame
+switch_plate_offset = 20;
+
 // JLF mount dimensions
 lever_mount_x = 53;
 lever_mount_y = 95;
@@ -39,7 +42,7 @@ frame_y = 208;
 frame_z = 50;
 
 // middle piece dimensions
-mid_frame_x = 83;
+mid_frame_x = 88;
 
 /*
 frame_x = 233;
