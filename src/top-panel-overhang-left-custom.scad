@@ -5,6 +5,7 @@
 
 include <parameters.scad>
 include <components.scad>
+include <kailhsocket.scad>
 //translate([0,0,-2.2-1.2]) import("F:/Custom Controller/SW_Kailh_Choc_V1.stl");
 *translate([0,0,5.8])rotate([180,0,0])import ("F:/Custom Controller/slimbox-2040-stickless-all-button-low-profile-fightstick-model_files/Buttons/KailhKeycap.stl");
 
@@ -49,21 +50,15 @@ module keyswitch_24mm() {
 }
 
 module top_panel_left_custom() {
-    *translate([-20, panel_y/6,0]) 
-    {
-        translate([0,0,-2.2-1.2]) import("F:/Custom Controller/SW_Kailh_Choc_V1.stl");
-    }
+
 	difference() {
 		panel_with_raised_overhang();
 
         //keyswitch_24mm();
         
         translate([-20, panel_y/6,0]) {
-            //dir_arc_24mm_directionals();
             button_24mm_hole();
-
             translate([29.5, 0, 0]) button_24mm_hole();
-;
             translate([29.5+26.3, -12.9, 0]) button_24mm_hole();
             // pinky (touchpad) button
             translate([-29.5, -8, 0]) button_24mm_hole();
@@ -78,33 +73,40 @@ module top_panel_left_custom() {
 
     //translate([-15, -40, -(panel_z/2) - 3]) rotate([0, 0, -45]) pcb_mount();
     //translate([0, 0, -(panel_z/2) - 3]) color("blue") switch_plate_mount();
+    translate([0, 0, -(panel_z/2) - 3]) rotate([180,0,0]){
+        //insert(CNCKM3);
+        insert_boss(CNCKM3, 6, wall = 3 * extrusion_width);
+    }
 
 }
 
 module top_panel_left_switch_plate() {
-    translate([0, 0, -panel_z+1.3+1]) difference() {
-        color("blue") switch_plate();
-        translate([-20, panel_y/6,0]) {
-            keyswitch_24mm_hole();
-            translate([29.5, 0, 0]) keyswitch_24mm_hole();
-;
-            translate([29.5+26.3, -12.9, 0]) keyswitch_24mm_hole();
-            // pinky (touchpad) button
-            translate([-29.5, -8, 0]) keyswitch_24mm_hole();
-            // W up button
-            translate([36, 28, 0]) keyswitch_24mm_hole();
-            // thumb buttons
-            translate([29.5+26.3+15.5, -65.2, 0]) keyswitch_24mm_hole();
-            translate([26.3+15.5, -65.2+8, 0]) keyswitch_24mm_hole();
-
-        }
+    translate([0, 0, 0]) {
+        color("blue", 0.2) switch_plate();
     }
+    translate([-20, panel_y/6,-4.85]) 
+        {
+            translate([0,0,2.2+0.8/2]) import("F:/Custom Controller/SW_Kailh_Choc_V1.stl");
+
+            kailh_choc_single_plate();
+            translate([29.5, 0, 0]) kailh_choc_single_plate();
+            translate([29.5+26.3, -12.9, 0]) kailh_choc_single_plate();
+            // pinky (touchpad) button
+            translate([-29.5, -8, 0]) kailh_choc_single_plate();
+            // W up button
+            translate([36, 28, 0]) kailh_choc_single_plate();
+            // thumb buttons
+            translate([29.5+26.3+15.5, -65.2, 0]) kailh_choc_single_plate();
+            translate([26.3+15.5, -65.2+8, 0]) kailh_choc_single_plate();
+        }
 }
+
+
 
 top_panel_left_custom();
 top_panel_left_switch_plate();
 
-intersection(){
+*intersection(){
 top_panel_left_custom();
 top_panel_left_switch_plate();
 }

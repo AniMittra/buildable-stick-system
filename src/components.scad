@@ -2,6 +2,7 @@
  * SPDX-FileCopyrightText: © 2023 Brian S. Stephan <bss@incorporeal.org>
  * SPDX-License-Identifier: GPL-3.0-or-later
  */
+include <NopSCADlib/lib.scad>
 
 module m4_hole() {
 	cylinder(r=m4_bolt_radius, h=100, $fn=50, center=true);
