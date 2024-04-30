@@ -6,8 +6,7 @@
 include <parameters.scad>
 include <components.scad>
 include <kailhsocket.scad>
-//translate([0,0,-2.2-1.2]) import("F:/Custom Controller/SW_Kailh_Choc_V1.stl");
-*translate([0,0,5.8])rotate([180,0,0])import ("F:/Custom Controller/slimbox-2040-stickless-all-button-low-profile-fightstick-model_files/Buttons/KailhKeycap.stl");
+
 
 module switch_plate_mount() {
 	translate([panel_x/2-switch_plate_offset, panel_y/2-switch_plate_offset, 0]) m3_mount_post();
@@ -81,23 +80,29 @@ module top_panel_left_custom() {
 }
 
 module top_panel_left_switch_plate() {
-    translate([0, 0, 0]) {
-        color("blue", 0.2) switch_plate();
+    translate([0, 0, -10]) {
+        *color("blue", 0.2) switch_plate();
     }
-    translate([-20, panel_y/6,-4.85]) 
+    translate([-20, panel_y/6,0]) 
         {
-            translate([0,0,2.2+0.8/2]) import("F:/Custom Controller/SW_Kailh_Choc_V1.stl");
+            #translate([0,0,-2.2-1.2]) import("F:/Custom Controller/SW_Kailh_Choc_V1.stl");
+            #translate([0,0,6.8])rotate([180,0,0])import ("F:/Custom Controller/slimbox-2040-stickless-all-button-low-profile-fightstick-model_files/Buttons/KailhKeycap.stl");
+            #translate([0,0,6.8])rotate([-90,0,0])import ("F:/Custom Controller/choc_v1_22.5mm_v2.stl");
 
-            kailh_choc_single_plate();
-            translate([29.5, 0, 0]) kailh_choc_single_plate();
-            translate([29.5+26.3, -12.9, 0]) kailh_choc_single_plate();
-            // pinky (touchpad) button
-            translate([-29.5, -8, 0]) kailh_choc_single_plate();
-            // W up button
-            translate([36, 28, 0]) kailh_choc_single_plate();
-            // thumb buttons
-            translate([29.5+26.3+15.5, -65.2, 0]) kailh_choc_single_plate();
-            translate([26.3+15.5, -65.2+8, 0]) kailh_choc_single_plate();
+            translate([0, 0,-4.85]) {
+                #translate([0,0,2.2+0.8/2]) import("F:/Custom Controller/SW_Kailh_Choc_V1.stl");
+                *keyswitch_24mm_hole()
+                kailh_choc_single_plate();
+                translate([29.5, 0, 0]) kailh_choc_single_plate();
+                translate([29.5+26.3, -12.9, 0]) kailh_choc_single_plate();
+                // pinky (touchpad) button
+                !translate([-29.5, -8, 0]) kailh_choc_single_plate();
+                // W up button
+                translate([36, 28, 0]) kailh_choc_single_plate();
+                // thumb buttons
+                translate([29.5+26.3+15.5, -65.2, 0]) kailh_choc_single_plate();
+                translate([26.3+15.5, -65.2+8, 0]) kailh_choc_single_plate();
+            }
         }
 }
 
