@@ -1,36 +1,67 @@
-include <BOSL2/constants.scad>
-use <BOSL2/masks3d.scad>
-include <BOSL2/std.scad>
-use <BOSL2/transforms.scad>
-include <BOSL2/threading.scad>
-include <BOSL2/screws.scad>
 
 
 include <parameters.scad>
 include <components.scad>
 include <kailhsocket.scad>
 
-*translate([0,0,0])rotate([0,0,0])import ("F:/Custom Controller/BUTTAFINGA+ROUND+ARCADE+STICK+BUTTONS/BF24flat.stl");
-*translate([0,0,0])rotate([0,0,0])import ("F:/Custom Controller/BUTTAFINGA+ROUND+ARCADE+STICK+BUTTONS/BF24ring.stl");
-*translate([0,0,0])rotate([0,0,0])import ("F:/Custom Controller/BUTTAFINGA+ROUND+ARCADE+STICK+BUTTONS/24mm_housing.stl");
+
 $fa=0.1;
 $fs=0.1;
 housing_radius=24/2;
-housing_inner_radius=20/2;
+housing_inner_radius=20.5/2;
 housing_chamfer=25;
-housing_height=12.0;
+housing_height=10.0;
 housing_thickness=2;
 thread_distance=1.2;
 housing_lip_radius=27.3/2;
 housing_lip_chamfer=25;
 housing_lip_height=2.1;
 housing_feet_radius=4/2;
-housing_feet_height=0.7;
+housing_feet_height=3.75;
 housing_feet_inner_radius=1.43/2;
 switch_x=13.8;
 switch_y=13.8;
-switch_housing_relief=1.6;
+switch_housing_relief=2;
 switch_base_height=2.2;
+
+plunger_radius=20/2;
+plunger_height=housing_height;
+choc_v1_stem_x=1.2;
+choc_v1_stem_y=3.0;
+choc_v1_stem_z=2.8;
+choc_v1_stem_chamfer=0.2;
+
+
+module references()
+{
+    *translate([0,0,housing_height+housing_feet_height])rotate([180,0,0])import ("F:/Custom Controller/slimbox-2040-stickless-all-button-low-profile-fightstick-model_files/Buttons/KailhKeycap.stl");
+    *translate([0,0,0])rotate([0,0,0])import ("F:/Custom Controller/BUTTAFINGA+ROUND+ARCADE+STICK+BUTTONS/BF24ring.stl");
+    right(30) import ("F:/Custom Controller/BUTTAFINGA+ROUND+ARCADE+STICK+BUTTONS/24mm_housing.stl");
+    *up(housing_feet_height+switch_base_height+5.8-3) import ("F:/Custom Controller/BUTTAFINGA+ROUND+ARCADE+STICK+BUTTONS/24mm_choc_v1_cap.stl");
+    
+    *up(housing_feet_height+5.2) import ("F:/Custom Controller/sanwa_24mm_plunger.stl");
+
+    *up(housing_feet_height) import("F:/Custom Controller/SW_Kailh_Choc_V1.stl");
+}
+
+module choc_v1_24mm_plunger() {
+    tag("body") diff()
+    {
+        up(housing_feet_height+switch_base_height)
+        {
+            up(3.0) tag("main") cyl(r=plunger_radius, h=plunger_height, center=false, chamfer2=1);
+            tag("remove") up(4.2) cuboid([16,16,10], anchor=TOP);
+
+        }
+    }
+    
+    // choc v1 stem
+    tag("stems") up(housing_feet_height+switch_base_height+4.2)
+    {
+        tag("stem") left(5.7/2) cuboid([choc_v1_stem_x,choc_v1_stem_y,choc_v1_stem_z], chamfer=choc_v1_stem_chamfer, edges=[BOTTOM]);
+        tag("stem") right(5.7/2) cuboid([choc_v1_stem_x,choc_v1_stem_y,choc_v1_stem_z], chamfer=choc_v1_stem_chamfer, edges=[BOTTOM]);
+    }
+}
 
 module choc_v1_24mm_housing() {
     switch_frame_x=17.8;
@@ -50,8 +81,8 @@ module choc_v1_24mm_housing() {
     switch_lower_lip_z=0.90;
     
     
-    *translate([0,0,2.2+0.8/2]) import("F:/Custom Controller/SW_Kailh_Choc_V1.stl");
-    *kailh_choc_single_plate();
+
+   
     // subtract the keyswitch holes
     *translate([-switch_x/2,-switch_y/2,switch_frame_z+switch_upper_lip_z]) kailh_choc_switch();
     // subtract the hotswap holes and recess
@@ -59,15 +90,15 @@ module choc_v1_24mm_housing() {
             
     
     diff(){
-        tag("body") union()
+        #tag("body") union()
         {
             // main thread body
              up(housing_feet_height){
                 *tag("housing") cyl(r=housing_inner_radius+housing_thickness, h=housing_height, center=false);
                 tag("thread") up(housing_height/2) threaded_rod(d=24, height=housing_height, pitch=3);
                 *tag("screw") up(housing_height/2) screw("M24", head="none",length=housing_height, atype="screw", bevel=false, blunt_start2=false);
-                screw=screw_info("M24");
-                thread=thread_specification(screw);
+                
+                thread=thread_specification(screw_info("M24"));
                 echo(thread);
                 // switch base is right underneath the upper lip (2.2mm from where pins start)
                 up(switch_base_height) 
@@ -100,12 +131,14 @@ module choc_v1_24mm_housing() {
                 // switch hole
                 tag("remove") cuboid([switch_hole_x, switch_hole_y, 50], anchor=CENTER); 
                 }
+                
+                // lip
+            tag("lip") up(housing_height) cyl(center=false, l=housing_lip_height, r=housing_lip_radius, chamfer2=0.6, chamfang2=45, from_end2=true);  // Default chamfang=45
+            // lip hole
+            tag("remove") up(housing_height) cyl(center=false, l=housing_lip_height, r=housing_inner_radius);  // Default chamfang=45
             }
 
-            // lip
-            tag("lip") up(12.6) cyl(center=false, l=housing_lip_height, r=housing_lip_radius, chamfer2=0.6, chamfang2=45, from_end2=true);  // Default chamfang=45
-            // lip hole
-            tag("remove") up(12.6) cyl(center=false, l=housing_lip_height, r=housing_inner_radius);  // Default chamfang=45
+            
 
             // feet
             tag("keep") move([9,1.63,0])difference(){
@@ -121,4 +154,6 @@ module choc_v1_24mm_housing() {
     }
 }
 
+references();
 choc_v1_24mm_housing();
+choc_v1_24mm_plunger();

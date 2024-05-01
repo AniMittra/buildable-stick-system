@@ -3,6 +3,13 @@
  * SPDX-License-Identifier: GPL-3.0-or-later
  */
 include <NopSCADlib/lib.scad>
+include <BOSL2/constants.scad>
+use <BOSL2/masks3d.scad>
+include <BOSL2/std.scad>
+use <BOSL2/transforms.scad>
+include <BOSL2/threading.scad>
+include <BOSL2/screws.scad>
+include <BOSL2/bottlecaps.scad>
 
 module m4_hole() {
 	cylinder(r=m4_bolt_radius, h=100, $fn=50, center=true);
