@@ -8,9 +8,9 @@ include <kailhsocket.scad>
 $fa=0.1;
 $fs=0.1;
 housing_radius=24/2;
-housing_inner_radius=20.5/2;
+housing_inner_radius=20.25/2;
 housing_chamfer=25;
-housing_height=10.0;
+housing_height=12.0;
 housing_thickness=2;
 thread_distance=1.2;
 housing_lip_radius=27.3/2;
@@ -24,42 +24,77 @@ switch_y=13.8;
 switch_housing_relief=2;
 switch_base_height=2.2;
 
-plunger_radius=20/2;
+plunger_radius=19.5/2;
 plunger_height=housing_height;
 choc_v1_stem_x=1.2;
 choc_v1_stem_y=3.0;
-choc_v1_stem_z=2.8;
+choc_v1_stem_z=4;
 choc_v1_stem_chamfer=0.2;
+choc_v1_upper_z=5.8;
+choc_v1_switch_z=3.0;
+plunger_brace_x=8.9;
+plunger_brace_y=1.5;
+plunger_brace_z=0.70;
 
 
 module references()
 {
     *translate([0,0,housing_height+housing_feet_height])rotate([180,0,0])import ("F:/Custom Controller/slimbox-2040-stickless-all-button-low-profile-fightstick-model_files/Buttons/KailhKeycap.stl");
+    
+    left(100) fwd(63) up(housing_feet_height) import ("F:/Custom Controller/Hardware/OSBMX/Other Configurations/OSBMX 24 - Single Housing.stl");
+    
+    *left(35.25*2) up(housing_feet_height) import ("F:/Custom Controller/OSBCH-main/OSBCH-main/STL Files/Body.stl");
+
     *translate([0,0,0])rotate([0,0,0])import ("F:/Custom Controller/BUTTAFINGA+ROUND+ARCADE+STICK+BUTTONS/BF24ring.stl");
-    right(30) import ("F:/Custom Controller/BUTTAFINGA+ROUND+ARCADE+STICK+BUTTONS/24mm_housing.stl");
+    
+    right(30) up(3) import ("F:/Custom Controller/BUTTAFINGA+ROUND+ARCADE+STICK+BUTTONS/24mm_housing.stl");
+    
     *up(housing_feet_height+switch_base_height+5.8-3) import ("F:/Custom Controller/BUTTAFINGA+ROUND+ARCADE+STICK+BUTTONS/24mm_choc_v1_cap.stl");
     
     *up(housing_feet_height+5.2) import ("F:/Custom Controller/sanwa_24mm_plunger.stl");
+    
+    *left(35.25) up(10.0) zflip() import ("F:/Custom Controller/button_large.stl");
+    
+    *left(32.4) back(29) up(13.4) zflip() import ("F:/Custom Controller/choc_button_cap.stl");
+
 
     *up(housing_feet_height) import("F:/Custom Controller/SW_Kailh_Choc_V1.stl");
 }
 
 module choc_v1_24mm_plunger() {
-    tag("body") diff()
-    {
-        up(housing_feet_height+switch_base_height)
+    *tag("plunger"){
+        tag("body") diff("remove")
         {
-            up(3.0) tag("main") cyl(r=plunger_radius, h=plunger_height, center=false, chamfer2=1);
-            tag("remove") up(4.2) cuboid([16,16,10], anchor=TOP);
+            up(housing_feet_height+switch_base_height)
+            {
+                up(choc_v1_upper_z-choc_v1_switch_z) tag("main") cyl(r=plunger_radius, h=plunger_height, anchor=BOTTOM, chamfer2=1);
+                // cutout square shape
+                tag("remove") up(choc_v1_upper_z+plunger_brace_z) cuboid([16,16,10], anchor=TOP);
 
+            }
         }
-    }
-    
-    // choc v1 stem
-    tag("stems") up(housing_feet_height+switch_base_height+4.2)
-    {
-        tag("stem") left(5.7/2) cuboid([choc_v1_stem_x,choc_v1_stem_y,choc_v1_stem_z], chamfer=choc_v1_stem_chamfer, edges=[BOTTOM]);
-        tag("stem") right(5.7/2) cuboid([choc_v1_stem_x,choc_v1_stem_y,choc_v1_stem_z], chamfer=choc_v1_stem_chamfer, edges=[BOTTOM]);
+        
+        // choc v1 stem
+        tag("stems") up(housing_feet_height+switch_base_height+choc_v1_upper_z)
+        {
+            up(plunger_brace_z){
+            diff(){
+                tag("stem") left(5.7/2) cuboid([choc_v1_stem_x,choc_v1_stem_y,choc_v1_stem_z], anchor=TOP, chamfer=choc_v1_stem_chamfer, edges=[BOTTOM]);
+                tag("remove") left(5.7/2-choc_v1_stem_x+choc_v1_stem_chamfer) cuboid([choc_v1_stem_x,1.5,choc_v1_stem_z+1], anchor=TOP, chamfer=choc_v1_stem_chamfer);
+                tag("remove") left(5.7/2+choc_v1_stem_x-choc_v1_stem_chamfer) cuboid([choc_v1_stem_x,1.5,choc_v1_stem_z+1], anchor=TOP, chamfer=choc_v1_stem_chamfer);
+
+
+                
+                tag("stem") right(5.7/2) cuboid([choc_v1_stem_x,choc_v1_stem_y,choc_v1_stem_z], anchor=TOP, chamfer=choc_v1_stem_chamfer, edges=[BOTTOM]);
+                tag("remove") right(5.7/2-choc_v1_stem_x+choc_v1_stem_chamfer) cuboid([choc_v1_stem_x,1.5,choc_v1_stem_z+1], anchor=TOP, chamfer=choc_v1_stem_chamfer);
+                tag("remove") right(5.7/2+choc_v1_stem_x-choc_v1_stem_chamfer) cuboid([choc_v1_stem_x,1.5,choc_v1_stem_z+1], anchor=TOP, chamfer=choc_v1_stem_chamfer);
+
+
+                }
+            // add a brace
+            tag("brace") up() cuboid([plunger_brace_x,plunger_brace_y,plunger_brace_z], anchor=TOP);
+            }
+        }
     }
 }
 
@@ -79,44 +114,33 @@ module choc_v1_24mm_housing() {
     switch_lower_lip_x=14.5;
     switch_lower_lip_y=13.8;
     switch_lower_lip_z=0.90;
-    
-    
-
-   
-    // subtract the keyswitch holes
-    *translate([-switch_x/2,-switch_y/2,switch_frame_z+switch_upper_lip_z]) kailh_choc_switch();
-    // subtract the hotswap holes and recess
-    *translate([-base_x/2-5,base_y/2-3.8,0]) kailh_hot_swap_choc(10);
             
     
     diff(){
-        #tag("body") union()
+        tag("body") union()
         {
             // main thread body
              up(housing_feet_height){
+                tag("trap-thread") up(housing_height/2) trapezoidal_threaded_rod(d=24, height=housing_height, pitch=4, thread_angle=115, thread_depth=1.27, blunt_start=false);
+
+             
                 *tag("housing") cyl(r=housing_inner_radius+housing_thickness, h=housing_height, center=false);
-                tag("thread") up(housing_height/2) threaded_rod(d=24, height=housing_height, pitch=3);
-                *tag("screw") up(housing_height/2) screw("M24", head="none",length=housing_height, atype="screw", bevel=false, blunt_start2=false);
+                *tag("thread") up(housing_height/2) threaded_rod(d=24, height=housing_height, pitch=2);
                 
-                thread=thread_specification(screw_info("M24"));
-                echo(thread);
+                *generic_bottle_neck(neck_d=housing_inner_radius*2+1, id=housing_inner_radius*2, thread_od=housing_radius*2, height=housing_height, support_d=0, spin=-16);
+
+                
+                *echo(thread_specification(screw_info("M24")));
                 // switch base is right underneath the upper lip (2.2mm from where pins start)
                 up(switch_base_height) 
                 {
                     // housing relief
                     tag("relief") 
                     {
-                        tag("remove") zrot(45) cuboid([25, switch_housing_relief, housing_height-switch_base_height-1], rounding=switch_housing_relief/2, anchor=BOTTOM); 
-                        tag("remove") zrot(-45) cuboid([25, switch_housing_relief, housing_height-switch_base_height-1], rounding=switch_housing_relief/2, anchor=BOTTOM); 
-                        // square switch cutout
-                        *tag("remove") cube([13.8, 13.8, 50], center=true); 
-                        *translate([-18/2,-18/2,0]) cube([18, 18, 15], center=false); 
-                        // 13.8 hole through the whole button
-                        *tag("remove")  cuboid([13.8, 13.8, 50], anchor=CENTER); 
-                        // switch clip frame
-                        *tag("remove") cuboid([15.25, 15.25, housing_height-switch_base_height-1], anchor=BOTTOM); 
-                        *tag("remove") down(1.3) cuboid([14.5, 13.8, 0.9], anchor=TOP); 
-                     }                    
+                        tag("remove") zrot(45) cuboid([50, switch_housing_relief, housing_height-switch_base_height-1], rounding=switch_housing_relief/2, anchor=BOTTOM); 
+                        tag("remove") zrot(-45) cuboid([50, switch_housing_relief, housing_height-switch_base_height-1], rounding=switch_housing_relief/2, anchor=BOTTOM); 
+                       
+                       }                    
                         // 
                      tag("frame") 
                      {
