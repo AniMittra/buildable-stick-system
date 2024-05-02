@@ -214,6 +214,12 @@ module panel() {
 		panel_holes();
 	}
 }
+module middle_panel() {
+	difference() {
+		middle_base_panel();
+		mid_panel_holes();
+	}
+}
 
 module bottom_panel() {
 	difference() {
@@ -440,6 +446,7 @@ module frame_mount_column() {
 		polygon([[10, 10], [-20, 10], [10, -20]]);
 }
 
+
 module side_chopper() {
 	translate([(frame_x-frame_wall)/2+panel_overhang_amount, 0, 0])
 		cube([frame_wall+panel_overhang_amount*2, overhang_panel_y, frame_z], center=true);
@@ -473,6 +480,7 @@ module base_frame() {
 	translate([-panel_to_frame_point_x, -(panel_to_frame_point_y), 0]) rotate([0, 0, 180])  frame_mount_column();
 	translate([panel_to_frame_point_x, -(panel_to_frame_point_y), 0]) rotate([0, 0, 270])  frame_mount_column();
 }
+
 
 module base_mid_frame() {
 	mid_frame_box();

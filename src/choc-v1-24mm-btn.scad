@@ -58,11 +58,11 @@ module references()
     *left(32.4) back(29) up(13.4) zflip() import ("F:/Custom Controller/choc_button_cap.stl");
 
 
-    *up(housing_feet_height) import("F:/Custom Controller/SW_Kailh_Choc_V1.stl");
+    up(housing_feet_height) import("F:/Custom Controller/SW_Kailh_Choc_V1.stl");
 }
 
 module choc_v1_24mm_plunger() {
-    *tag("plunger"){
+    tag("plunger"){
         tag("body") diff("remove")
         {
             up(housing_feet_height+switch_base_height)
@@ -117,7 +117,7 @@ module choc_v1_24mm_housing() {
             
     
     diff(){
-        tag("body") union()
+        #tag("body") union()
         {
             // main thread body
              up(housing_feet_height){
@@ -130,7 +130,6 @@ module choc_v1_24mm_housing() {
                 *generic_bottle_neck(neck_d=housing_inner_radius*2+1, id=housing_inner_radius*2, thread_od=housing_radius*2, height=housing_height, support_d=0, spin=-16);
 
                 
-                *echo(thread_specification(screw_info("M24")));
                 // switch base is right underneath the upper lip (2.2mm from where pins start)
                 up(switch_base_height) 
                 {
