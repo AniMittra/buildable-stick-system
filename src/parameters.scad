@@ -5,6 +5,8 @@
 
 // adjustments
 hole_tolerance = 0.15;
+$slop = 0.15;
+
 
 // M2
 m2_screw_selftap_radius = 0.95;

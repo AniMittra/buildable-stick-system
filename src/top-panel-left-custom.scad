@@ -8,6 +8,7 @@ include <components.scad>
 include <kailhsocket.scad>
 
 switchPlateDepth=-6.8;
+switchPlateZ=1.3;
 switchPlateMountOffset1=25;
 switchPlateMountOffset2=12.5;
 
@@ -61,14 +62,14 @@ module switch_plate_mount() {
         point=insertPlacements[i];
         translate([point[0],point[1],point[2]])
         {
-            insert_boss(CNCKM3, -switchPlateDepth, wall = 3 * extrusion_width);
+            insert_boss(CNCKM3, panel_z, wall = 3 * extrusion_width);
  
         }
     }
 }
 
 module switch_plate() {
-    translate([-(panel_x-switch_plate_offset*2+10)/2,-(panel_y-switch_plate_offset*2+10)/2,0]) cube([panel_x-switch_plate_offset*2+10, panel_y-switch_plate_offset*2+10, 1.3+1], center=false);
+    translate([-(panel_x-switch_plate_offset*2+10)/2,-(panel_y-switch_plate_offset*2+10)/2,0]) cube([panel_x-switch_plate_offset*2+10, panel_y-switch_plate_offset*2+10, switchPlateZ], center=false);
 }
 
 
@@ -127,9 +128,9 @@ module top_panel_left_custom() {
 }
 
 module top_panel_left_switch_plate() {
-    *tag("switch_plate") {
+    tag("switch_plate") {
         
-        translate([0, 0, switchPlateDepth]) {
+        translate([0, 0, switchPlateDepth+4.85/2-switchPlateZ/2]) {
             difference() {
             #color("blue", 0.2) switch_plate();
             translate([-20, panel_y/6,0])
@@ -145,7 +146,7 @@ module top_panel_left_switch_plate() {
         }
         translate([-20, panel_y/6,0]) 
             {
-                *translate([0,0,-2.2-1.2-2]) import("F:/Custom Controller/SW_Kailh_Choc_V1.stl");
+                yflip() xflip() translate([0,0,-2.2-1.2-2]) import("F:/Custom Controller/SW_Kailh_Choc_V1.stl");
                 *translate([0,0,6.8-2])rotate([180,0,0])import ("F:/Custom Controller/slimbox-2040-stickless-all-button-low-profile-fightstick-model_files/Buttons/KailhKeycap.stl");
                 *translate([0,0,6.8])rotate([-90,0,0])import ("F:/Custom Controller/choc_v1_22.5mm_v2.stl");
 
