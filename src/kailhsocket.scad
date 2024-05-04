@@ -108,21 +108,35 @@ module kailh_hot_swap_choc(extend_cables=0){
     }
 }
 
-module kailh_choc_single_plate() {
+module kailh_choc_single_plate(showFeet=false) {
     diff("remove"){
         tag("switch-housing") attachable() {            
             // main cube box
 //            translate([-switch_frame_x/2, -switch_frame_y/2, 0])
             tag("main-housing")  color("blue", 0.5)
             cube([switch_frame_x,switch_frame_y,switch_frame_z], anchor=BOTTOM)
-//            attach(RIGHT,FRONT,align=TOP) cube([2,5,15]);
-            attach(TOP,TOP,align=FRONT+RIGHT) color("lightblue") prismoid(5,3,3);
-            *show_anchors();
+            if(showFeet)
+            {
+                diff("text")
+                attach([LEFT,RIGHT],BACK,align=TOP)
+                cube([switch_frame_x,5,10])
+                up(2) xflip() attach(FRONT, TOP, inside=true) 
+                tag("text") linear_extrude(1.2) 
+                {
+                    text(
+                        text=format_fixed($slop,2),
+                        size=5,
+                        halign="center",
+                        valign="center"
+                        );
+                }
+            }            
+        
+            
+
+            
             // framing border 
             union() {
-                *tag("test-feet") {
-//                 attach(RIGHT,BOT,align=[TOP]) cuboid([2,5,15]);   
-                }
                 tag("switch-framing") up(switch_frame_z) color("orange", 0.5)
                 difference() {
                     cuboid([switch_frame_x,switch_frame_y,switch_frame_inner_z], anchor=BOTTOM);
@@ -139,7 +153,7 @@ module kailh_choc_single_plate() {
         // subtract the keyswitch holes
         tag("remove") translate([-switch_x/2,-switch_y/2,switch_frame_z+switch_upper_lip_z]) kailh_choc_switch();
         // subtract the hotswap holes and recess
-        tag("remove") kailh_hot_swap_choc(10);
+        tag("remove") kailh_hot_swap_choc(0);
         // let's not leave room for 3d print issue with hot swap edge
         tag("remove") {
             translate([0,-2.5,0]) cuboid([switch_frame_x,switch_frame_y/2,clip_z], anchor=BOTTOM+BACK);
@@ -151,5 +165,5 @@ module kailh_choc_single_plate() {
 
 //kailh_choc_switch();
 *translate([0,0,2.2+0.8/2]) rotate([0,0,180]) import("F:/Custom Controller/SW_Kailh_Choc_V1.stl");
-kailh_choc_single_plate();
+kailh_choc_single_plate(showFeet=true);
 //#kailh_hot_swap_choc(0);
