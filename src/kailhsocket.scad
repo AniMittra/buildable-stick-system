@@ -4,36 +4,48 @@ include <components.scad>
 $fn=60;
 
 //hotswap
-tolerance=0.2;
+$slop=0.0;
 
 cyl_h=10.05;
-cyl_d=3;
+cyl_d=3+$slop;
 
-base_x=4.75+tolerance;
-base_x_sum=9.55+tolerance;
-base_y=4.65+tolerance;
-base_y_sum=6.85+tolerance;
-base_z=1.8+tolerance;
+choc_hole_h=3;
+choc_main_hole_d=3.8+$slop;
+choc_side_hole_d=1.9+$slop;
+choc_contact_hole_d=1.2+$slop;
 
-clip_x=1.68+tolerance;
-clip_y=(13.15-9.95)/2+tolerance*2;
-clip_z=1.85+tolerance;
+base_x=4.75+$slop;
+base_x_sum=9.55+$slop;
+base_y=4.65+$slop;
+base_y_sum=6.85+$slop;
+base_z=1.8+$slop;
 
-switch_frame_x=17.8;
-switch_frame_y=17.8;
-switch_frame_z=4.85;
-switch_recess_x=13.8;
-switch_recess_y=13.8;
-switch_recess_z=2.2;
+clip_x=1.68+$slop;
+clip_y=(13.15-9.95)/2+$slop*2;
+clip_z=1.85+$slop;
+
 switch_x=15;
 switch_y=15;
 switch_z=5.8+2.2+2.65;
 plastic_pin_z=2.65;
 metal_pin_z=3;
 switch_upper_lip_z=0.80;
-switch_lower_lip_x=14.5;
+
+switch_frame_x=17.8;
+switch_frame_y=17.8;
+switch_frame_z=4.85;
+switch_frame_inner_x=switch_x+0.25+$slop;
+switch_frame_inner_y=switch_y+0.25+$slop;
+switch_frame_inner_z=switch_upper_lip_z+0.25+$slop;
+
+switch_recess_x=13.8+$slop;
+switch_recess_y=13.8+$slop;
+switch_recess_z=2.2;
+switch_lower_lip_x=14.5+$slop;
 switch_lower_lip_y=switch_recess_y;
-switch_lower_lip_z=0.90;
+switch_lower_lip_z=0.90+$slop;
+
+
 
 //based on:
 //https://www.kailhswitch.com/Content/upload/pdf/201915927/CPG135001D03_-_White_Clicky_Choc.pdf  
@@ -47,18 +59,18 @@ module kailh_choc_switch(){
         cube([13.8,13.6,2.2]);
         
         translate([7.5,7.5,3]){
-            cylinder(h=3,d=3.8);
+            cylinder(h=choc_hole_h,d=choc_main_hole_d);
             
             translate([0,+5.5,0])
-            cylinder(h=3,d=1.9);
+            cylinder(h=choc_hole_h,d=choc_side_hole_d);
             translate([0,-5.5,0])
-            cylinder(h=3,d=1.9);
+            cylinder(h=choc_hole_h,d=choc_side_hole_d);
             
             //contacts
             translate([-5.9,0,0])
-            cylinder(h=3,d=1.2);
+            cylinder(h=choc_hole_h,d=choc_contact_hole_d);
             translate([-3.8,-5,0])
-            cylinder(h=3,d=1.2);
+            cylinder(h=choc_hole_h,d=choc_contact_hole_d);
         }
     }
 }
@@ -66,18 +78,14 @@ module kailh_choc_switch(){
 //based on:
 //https://www.kailhswitch.com/Content/upload/pdf/202115927/CPG135001S30-data-sheet.pdf
 module kailh_hot_swap_choc(extend_cables=0){
-    // let's not leave room for 3d print issue
-    *tag("hot-swap-edge") {
-        translate([0,-2.5,0]) cuboid([switch_frame_x,switch_frame_y/2,base_z], anchor=BOTTOM+BACK);
-    }
     translate([-base_x/2-5,base_y/2-3.8,0])
     mirror([0,0,1]) rotate([180,0,0]) union()
     {
         //plastic
-        color("red"){
+        color("pink"){
             cube([base_x,base_y,base_z]);
             
-            #translate([base_x_sum-base_x,base_y_sum-base_y,0])
+            translate([base_x_sum-base_x,base_y_sum-base_y,0])
             cube([base_x,base_y,base_z]);
             
             translate([base_x/2,base_y/2,0]){
@@ -97,32 +105,51 @@ module kailh_hot_swap_choc(extend_cables=0){
             translate([base_x_sum-base_y/2,base_y_sum-base_y/2-clip_y/2,0])
             cube([clip_x+base_y/2+extend_cables, clip_y, clip_z]);
         }
+    }
+}
+
+module kailh_choc_single_plate() {
+    diff("remove"){
+        tag("switch-housing") attachable() {            
+            // main cube box
+//            translate([-switch_frame_x/2, -switch_frame_y/2, 0])
+            tag("main-housing")  color("blue", 0.5)
+            cube([switch_frame_x,switch_frame_y,switch_frame_z], anchor=BOTTOM)
+//            attach(RIGHT,FRONT,align=TOP) cube([2,5,15]);
+            attach(TOP,TOP,align=FRONT+RIGHT) color("lightblue") prismoid(5,3,3);
+            *show_anchors();
+            // framing border 
+            union() {
+                *tag("test-feet") {
+//                 attach(RIGHT,BOT,align=[TOP]) cuboid([2,5,15]);   
+                }
+                tag("switch-framing") up(switch_frame_z) color("orange", 0.5)
+                difference() {
+                    cuboid([switch_frame_x,switch_frame_y,switch_frame_inner_z], anchor=BOTTOM);
+                    cuboid([switch_frame_inner_x,switch_frame_inner_y,10], anchor=BOTTOM);
+                }
+                
+            }
+        }
+        // recess from the top so keyswitch can sit in
+        tag("remove") translate([-switch_recess_x/2, -switch_recess_y/2, plastic_pin_z]) cube([switch_recess_x,switch_recess_y,switch_recess_z]);
+        // create space for the bottom lip to clip in to
+        tag("remove") translate([-switch_lower_lip_x/2, -switch_lower_lip_y/2, plastic_pin_z]) cube([switch_lower_lip_x,switch_lower_lip_y,switch_lower_lip_z]);
+
+        // subtract the keyswitch holes
+        tag("remove") translate([-switch_x/2,-switch_y/2,switch_frame_z+switch_upper_lip_z]) kailh_choc_switch();
+        // subtract the hotswap holes and recess
+        tag("remove") kailh_hot_swap_choc(10);
+        // let's not leave room for 3d print issue with hot swap edge
+        tag("remove") {
+            translate([0,-2.5,0]) cuboid([switch_frame_x,switch_frame_y/2,clip_z], anchor=BOTTOM+BACK);
+        }
         
 
     }
 }
 
-module kailh_choc_single_plate() {
-    difference(){
-    // main cube frame
-    translate([-switch_frame_x/2, -switch_frame_y/2, 0]) color("blue", 0.5)
-    cube([switch_frame_x,switch_frame_y,switch_frame_z]);
-    // recess from the top so keyswitch can sit in
-    translate([-switch_recess_x/2, -switch_recess_y/2, plastic_pin_z]) cube([switch_recess_x,switch_recess_y,switch_recess_z]);
-    // create space for the bottom lip to clip in to
-    translate([-switch_lower_lip_x/2, -switch_lower_lip_y/2, plastic_pin_z]) cube([switch_lower_lip_x,switch_lower_lip_y,switch_lower_lip_z]);
-
-    // subtract the keyswitch holes
-    translate([-switch_x/2,-switch_y/2,switch_frame_z+switch_upper_lip_z]) kailh_choc_switch();
-    // subtract the hotswap holes and recess
-    
-    //translate([-switch_frame_x/2+3.8-base_y/2-0,-base_x/2+0.9,0]);
-    //translate([-base_x/2-5,base_y/2-3.8,0])
-    kailh_hot_swap_choc(10);
-    }
-}
-
 //kailh_choc_switch();
-//translate([0,0,2.2+0.8/2]) rotate([0,0,180]) import("F:/Custom Controller/SW_Kailh_Choc_V1.stl");
-//kailh_choc_single_plate();
+*translate([0,0,2.2+0.8/2]) rotate([0,0,180]) import("F:/Custom Controller/SW_Kailh_Choc_V1.stl");
+kailh_choc_single_plate();
 //#kailh_hot_swap_choc(0);

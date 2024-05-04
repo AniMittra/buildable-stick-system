@@ -17,7 +17,7 @@ housing_lip_radius=27.3/2;
 housing_lip_chamfer=25;
 housing_lip_height=2.1;
 housing_feet_radius=4/2;
-housing_feet_height=3.75;
+housing_feet_height=0.8;
 housing_feet_inner_radius=1.43/2;
 switch_x=13.8;
 switch_y=13.8;
@@ -61,9 +61,9 @@ module references()
     
     *left(35.25*2) up(housing_feet_height) import ("F:/Custom Controller/OSBCH-main/OSBCH-main/STL Files/Body.stl");
 
-    left(236) fwd(190) down(5) import ("F:/Custom Controller/BUTTAFINGA+ROUND+ARCADE+STICK+BUTTONS/BF24ring.stl");
+    *left(236) fwd(190) down(5) import ("F:/Custom Controller/BUTTAFINGA+ROUND+ARCADE+STICK+BUTTONS/BF24ring.stl");
     
-    *right(30) up(3) import ("F:/Custom Controller/BUTTAFINGA+ROUND+ARCADE+STICK+BUTTONS/24mm_housing.stl");
+    *right(0) up(0) import ("F:/Custom Controller/BUTTAFINGA+ROUND+ARCADE+STICK+BUTTONS/24mm_housing.stl");
     
     *up(housing_feet_height+switch_base_height+5.8-3) import ("F:/Custom Controller/BUTTAFINGA+ROUND+ARCADE+STICK+BUTTONS/24mm_choc_v1_cap.stl");
     
@@ -74,7 +74,7 @@ module references()
     *left(32.4) back(29) up(13.4) zflip() import ("F:/Custom Controller/choc_button_cap.stl");
 
 
-    *up(housing_feet_height) import("F:/Custom Controller/SW_Kailh_Choc_V1.stl");
+    up(housing_feet_height) yflip() xflip() import("F:/Custom Controller/SW_Kailh_Choc_V1.stl");
 }
 
 module choc_v1_24mm_plunger() {
@@ -115,22 +115,21 @@ module choc_v1_24mm_plunger() {
 }
 
 module choc_v1_24mm_housing() {
-
-            
+    $slop=0.00;
+    echo(get_slop());
     
     diff(){
         tag("body") union()
         {
             // main thread body
              up(housing_feet_height){
-                tag("trap-thread") up(housing_height/2) trapezoidal_threaded_rod(d=24, height=housing_height, pitch=4, thread_angle=115, thread_depth=1.27, blunt_start=false);
+                *tag("trap-thread") up(housing_height/2) trapezoidal_threaded_rod(d=24, height=housing_height, pitch=4, thread_angle=115, thread_depth=1.27, spin=180, blunt_start=false);
 
              
-                *tag("housing") cyl(r=housing_inner_radius+housing_thickness, h=housing_height, center=false);
                 *tag("thread") up(housing_height/2) threaded_rod(d=24, height=housing_height, pitch=3);
                 
-                *tag("bottle-thread") intersection() {
-                    down(housing_height/2-1) generic_bottle_neck(neck_d=housing_inner_radius*2+1, id=housing_inner_radius*2, thread_od=housing_radius*2, height=housing_height*1.5, support_d=0, spin=-16);
+                tag("bottle-thread") intersection() {
+                    down(housing_height/2-1) generic_bottle_neck(pitch=3.2, neck_d=housing_inner_radius*2+1, id=0, thread_od=housing_radius*2, height=housing_height*1.5, support_d=0, spin=-16);
                     cyl(r=housing_radius+housing_thickness, h=housing_height, center=false);
                 }
                 
@@ -140,41 +139,44 @@ module choc_v1_24mm_housing() {
                     // housing relief
                     tag("relief") 
                     {
-                        tag("remove") zrot(45) cuboid([50, switch_housing_relief, housing_height-switch_base_height-1], rounding=switch_housing_relief/2, anchor=BOTTOM); 
-                        tag("remove") zrot(-45) cuboid([50, switch_housing_relief, housing_height-switch_base_height-1], rounding=switch_housing_relief/2, anchor=BOTTOM); 
+                        tag("remove") zrot(45) cuboid([50, switch_housing_relief+$slop, housing_height-switch_base_height-1+$slop], rounding=switch_housing_relief/2, anchor=BOTTOM); 
+                        tag("remove") zrot(-45) cuboid([50, switch_housing_relief+$slop, housing_height-switch_base_height-1+$slop], rounding=switch_housing_relief/2, anchor=BOTTOM); 
                        
                        }                    
                         // 
                      tag("frame") 
                      {
                         // cylinder hole
-                        tag("remove") up(switch_upper_lip_z) cyl(r=housing_inner_radius, h=housing_height, center=false);
+                        tag("remove") up(switch_upper_lip_z) cyl(r=housing_inner_radius+$slop, h=housing_height, center=false);
                         // create space for the upper part of the switch (above upper lip)
-                        tag("remove") cuboid([switch_upper_x,switch_upper_y,switch_upper_z], anchor=BOTTOM);
+                        tag("remove") cuboid([switch_upper_x+$slop,switch_upper_y+$slop,switch_upper_z], anchor=BOTTOM);
                         // create space for the bottom lip to clip in to
-                        tag("remove") down(switch_base_height-switch_lower_lip_z) cuboid([switch_lower_lip_x,switch_lower_lip_y,switch_lower_lip_z+1], anchor=TOP);
+                        tag("remove") down(switch_base_height-switch_lower_lip_z) cuboid([switch_lower_lip_x+$slop,switch_lower_lip_y+$slop,switch_lower_lip_z+1+$slop], anchor=TOP);
                     }
                     
                 // switch hole
-                tag("remove") cuboid([switch_hole_x, switch_hole_y, 50], anchor=CENTER); 
+                tag("remove") cuboid([switch_hole_x+$slop, switch_hole_y+$slop, 50], anchor=CENTER); 
                 }
                 
                 // lip
-            tag("lip") up(housing_height) cyl(center=false, l=housing_lip_height, r=housing_lip_radius, chamfer2=0.6, chamfang2=45, from_end2=true);  // Default chamfang=45
+            *tag("lip") up(housing_height) cyl(center=false, l=housing_lip_height, r=housing_lip_radius, chamfer2=0.6, chamfang2=45, from_end2=true);
             // lip hole
-            tag("remove") up(housing_height) cyl(center=false, l=housing_lip_height, r=housing_inner_radius);  // Default chamfang=45
+            tag("remove") up(housing_height) cyl(center=false, l=housing_lip_height, r=housing_inner_radius+$slop);
             }
 
             
 
             // feet
-            tag("keep") move([9,1.63,0])difference(){
-                cyl(center=false, l=housing_feet_height, r=housing_feet_radius);
-                cyl(center=false, l=housing_feet_height, r=housing_feet_inner_radius);
-            }
-            tag("keep") move([-9,-1.63,0]) difference(){
-                cyl(center=false, l=housing_feet_height, r=housing_feet_radius);
-                cyl(center=false, l=housing_feet_height, r=housing_feet_inner_radius);
+            *tag("feet") 
+            {
+                move([9,1.63,0]) {
+                    cyl(center=false, l=housing_feet_height, r=housing_feet_radius);
+                    tag("remove") cyl(center=false, l=5, r=housing_feet_inner_radius);
+                }
+                move([-9,-1.63,0]) {
+                    cyl(center=false, l=housing_feet_height, r=housing_feet_radius);
+                    tag("remove") cyl(center=false, l=5, r=housing_feet_inner_radius);
+                }
             }
             
         }
@@ -182,6 +184,7 @@ module choc_v1_24mm_housing() {
 }
 
 module choc_v1_24mm_nut() {
+    $slop=0.30;
     echo(get_slop());
     24mm_nut_width=27.5;
     24mm_nut_inner_diameter=24.0;
@@ -194,30 +197,66 @@ module choc_v1_24mm_nut() {
 
     tag("nut") union()
     {
-        tag("trap-nut") down(20) trapezoidal_threaded_nut(nutwidth=24mm_nut_width, id=24mm_nut_inner_diameter, height=24mm_nut_height, pitch=24mm_nut_pitch, thread_angle=115, thread_depth=1.27, blunt_start=false, bevel=true, ibevel=false, $slop=0.0, anchor=BOTTOM);
-        
-        *tag("trap-nut") down(20) trapezoidal_threaded_nut(nutwidth=24mm_nut_width, id=24mm_nut_inner_diameter, height=24mm_nut_height, pitch=24mm_nut_pitch, thread_angle=115, thread_depth=1.27, blunt_start=false, bevel=true, ibevel=false, $slop=0.15, anchor=BOTTOM);
-            
-        *tag("trap-nut") down(20) trapezoidal_threaded_nut(nutwidth=24mm_nut_width, id=24mm_nut_inner_diameter, height=24mm_nut_height, pitch=24mm_nut_pitch, thread_angle=115, thread_depth=1.27, blunt_start=false, bevel=true, ibevel=false, $slop=0.25, anchor=BOTTOM);
+        *tag("trap-nut") up(0) {
+            //tag("trap-thread") up(housing_height/2) trapezoidal_threaded_rod(d=24, height=housing_height, pitch=4, thread_angle=115, thread_depth=1.27, blunt_start=false);
 
-        // main thread body
-        *up(housing_feet_height){
-            *tag("trap-thread") up(housing_height/2) trapezoidal_threaded_rod(d=24, height=housing_height, pitch=4, thread_angle=115, thread_depth=1.27, blunt_start=false);
-             
-            *tag("housing") cyl(r=housing_inner_radius+housing_thickness, h=housing_height, center=false);
-            
-            *tag("thread") up(housing_height/2) threaded_rod(d=24, height=housing_height, pitch=3);
-                
-            *tag("bottle-thread") intersection() {
-                down(housing_height/2-1) generic_bottle_neck(neck_d=housing_inner_radius*2+1, id=housing_inner_radius*2, thread_od=housing_radius*2, height=housing_height*1.5, support_d=0, spin=-16);
-                cyl(r=housing_radius+housing_thickness, h=housing_height, center=false);
+            intersection(){ 
+                trapezoidal_threaded_nut(nutwidth=24mm_nut_width, id=24mm_nut_inner_diameter, height=24mm_nut_height, pitch=24mm_nut_pitch, thread_angle=115, thread_depth=1.27, blunt_start=false, bevel=true, ibevel=true, $slop=$slop, anchor=BOTTOM);
+                generic_bottle_cap(texture="ribbed",neck_od=4, thread_depth=1, wall=24mm_nut_width/2-5, height=24mm_nut_height);
+            }
+            diff() {
+                tag("lip") cyl(r=24mm_lip_width/2, h=24mm_lip_height, anchor=BOTTOM);
+                tag("remove") down(5) cyl(r=24mm_nut_inner_diameter/2, h=10, anchor=BOTTOM);
+
+            }
+        }
+         
+        *tag("d24-p3-nut") up(0) {
+         //tag("thread") up(housing_height/2) threaded_rod(d=24, height=housing_height, pitch=3);
+
+            intersection(){ 
+                threaded_nut(nutwidth=24mm_nut_width, id=24mm_nut_inner_diameter, h=24mm_nut_height, pitch=3, blunt_start=false, bevel=true, ibevel=true, $slop=$slop, anchor=BOTTOM);
+                generic_bottle_cap(texture="knurled",neck_od=4, thread_depth=1, wall=24mm_nut_width/2-5, height=24mm_nut_height);
+            }
+            diff() {
+                tag("lip") cyl(r=24mm_lip_width/2, h=24mm_lip_height, anchor=BOTTOM);
+                tag("remove") down(5) cyl(r=24mm_nut_inner_diameter/2, h=10, anchor=BOTTOM);
+
+            }
+        }
+        
+        tag("bottle-nut") up(0) {
+//            tag("bottle-thread") intersection() {
+//                down(housing_height/2-1) generic_bottle_neck(neck_d=housing_inner_radius*2+1, id=0, thread_od=housing_radius*2, height=housing_height*1.5, support_d=0, spin=-16);
+//                cyl(r=housing_radius+housing_thickness, h=housing_height, center=false);
+//            }
+
+            diff() {
+                intersection() {
+                    tag("cap") generic_bottle_cap(texture="none",pitch=3.2, neck_od=housing_inner_radius*2+1+$slop, thread_od=housing_radius*2+$slop, wall=1, height=24mm_nut_height*1.5, spin=180+45);
+                    *tag("view-threads-helper") cyl(r=housing_radius, h=24mm_nut_height*1.5, anchor=BOTTOM);
+                }
+               
+
+                tag("lip") cyl(r=24mm_lip_width/2, h=24mm_lip_height, anchor=BOTTOM);
+                // lip hole
+                tag("remove") down(-24mm_lip_height) cyl(r=(24mm_nut_inner_diameter/2)+$slop, h=24mm_lip_height*2, anchor=TOP);
+                // cut off excess bottom
+                tag("remove") up(24mm_nut_height) cyl(r=24mm_nut_width, h=24mm_nut_height*1, anchor=BOTTOM);
+
+            }
+            // custom knurling
+            diff() {
+                tag("knurling") zrot_copies([0, 45, 90, 135, 180, 225, 270, 315]) fwd(housing_radius+1.0) cylinder(h=24mm_nut_height, r=1);
+                tag("remove") cyl(r=housing_radius+1, h=24mm_nut_height*1.5, anchor=BOTTOM);
+
             }
         }
     }
-}   
+}
 
 
-references();
+*references();
 *choc_v1_24mm_housing();
 *choc_v1_24mm_plunger();
 choc_v1_24mm_nut();
