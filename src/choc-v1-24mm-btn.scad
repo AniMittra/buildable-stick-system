@@ -77,13 +77,27 @@ module references()
     up(housing_feet_height) yflip() xflip() import("F:/Custom Controller/SW_Kailh_Choc_V1.stl");
 }
 
-module choc_v1_24mm_plunger() {
+module choc_v1_24mm_plunger(showSlop=false) {
+    $slop=0.30;
     tag("plunger"){
         tag("body") diff("remove")
         {
             up(housing_feet_height+switch_base_height)
             {
-                up(choc_v1_upper_z-choc_v1_switch_z) tag("main") cyl(r=plunger_radius, h=plunger_height, anchor=BOTTOM, chamfer2=1);
+                diff("text") up(choc_v1_upper_z-choc_v1_switch_z) tag("main") cyl(r=plunger_radius-$slop, h=plunger_height, anchor=BOTTOM, chamfer2=1)
+                if(showSlop)
+                {
+                    down(5) attach([LEFT,RIGHT], FRONT, inside=true) 
+                    xflip() tag("text") linear_extrude(1.2) 
+                    {
+                        text(
+                            text=suffix(format_fixed($slop,2),2),
+                            size=3.5,
+                            halign="center",
+                            valign="center"
+                            );
+                    }
+                };
                 // cutout square shape
                 tag("remove") up(choc_v1_upper_z+plunger_brace_z) cuboid([16,16,10], anchor=TOP);
 
@@ -95,13 +109,13 @@ module choc_v1_24mm_plunger() {
         {
             up(plunger_brace_z){
             diff(){
-                tag("stem") left(5.7/2) cuboid([choc_v1_stem_x,choc_v1_stem_y,choc_v1_stem_z], anchor=TOP, chamfer=choc_v1_stem_chamfer, edges=[BOTTOM]);
+                tag("stem") left(5.7/2) cuboid([choc_v1_stem_x-$slop,choc_v1_stem_y-$slop,choc_v1_stem_z], anchor=TOP, chamfer=choc_v1_stem_chamfer, edges=[BOTTOM]);
                 tag("remove") left(5.7/2-choc_v1_stem_x+choc_v1_stem_chamfer) cuboid([choc_v1_stem_x,1.5,choc_v1_stem_z+1], anchor=TOP, chamfer=choc_v1_stem_chamfer);
                 tag("remove") left(5.7/2+choc_v1_stem_x-choc_v1_stem_chamfer) cuboid([choc_v1_stem_x,1.5,choc_v1_stem_z+1], anchor=TOP, chamfer=choc_v1_stem_chamfer);
 
 
                 
-                tag("stem") right(5.7/2) cuboid([choc_v1_stem_x,choc_v1_stem_y,choc_v1_stem_z], anchor=TOP, chamfer=choc_v1_stem_chamfer, edges=[BOTTOM]);
+                tag("stem") right(5.7/2) cuboid([choc_v1_stem_x-$slop,choc_v1_stem_y-$slop,choc_v1_stem_z], anchor=TOP, chamfer=choc_v1_stem_chamfer, edges=[BOTTOM]);
                 tag("remove") right(5.7/2-choc_v1_stem_x+choc_v1_stem_chamfer) cuboid([choc_v1_stem_x,1.5,choc_v1_stem_z+1], anchor=TOP, chamfer=choc_v1_stem_chamfer);
                 tag("remove") right(5.7/2+choc_v1_stem_x-choc_v1_stem_chamfer) cuboid([choc_v1_stem_x,1.5,choc_v1_stem_z+1], anchor=TOP, chamfer=choc_v1_stem_chamfer);
 
@@ -114,24 +128,71 @@ module choc_v1_24mm_plunger() {
     }
 }
 
-module choc_v1_24mm_housing() {
-    $slop=0.00;
-    echo(get_slop());
+module choc_v1_24mm_housing(showSlop=false) {
+    $slop=0.30;
+    *echo(get_slop());
     
     diff(){
         tag("body") union()
         {
             // main thread body
              up(housing_feet_height){
-                *tag("trap-thread") up(housing_height/2) trapezoidal_threaded_rod(d=24, height=housing_height, pitch=4, thread_angle=115, thread_depth=1.27, spin=180, blunt_start=false);
+                diff("text") {
+                    *tag("trap-thread")  up(housing_height/2) trapezoidal_threaded_rod(d=24, height=housing_height, pitch=4, thread_angle=115, thread_depth=1.27, spin=180, blunt_start=true)
+                         if(showSlop)
+                        {
+                            fwd(10) xflip() attach(BOTTOM, TOP, inside=true) 
+                            tag("text") linear_extrude(1.2) 
+                            {
+                                text(
+                                    text=suffix(format_fixed($slop,2),2),
+                                    size=2.5,
+                                    halign="center",
+                                    valign="center"
+                                    );
+                            }
+                        };
 
-             
-                *tag("thread") up(housing_height/2) threaded_rod(d=24, height=housing_height, pitch=3);
-                
-                tag("bottle-thread") intersection() {
-                    down(housing_height/2-1) generic_bottle_neck(pitch=3.2, neck_d=housing_inner_radius*2+1, id=0, thread_od=housing_radius*2, height=housing_height*1.5, support_d=0, spin=-16);
-                    cyl(r=housing_radius+housing_thickness, h=housing_height, center=false);
+                 
+                    *tag("d24-p3-thread") up(housing_height/2) threaded_rod(d=24, height=housing_height, pitch=3)
+                        #if(showSlop)
+                        {
+                            fwd(10) xflip() attach(BOTTOM, TOP, inside=true) 
+                            tag("text") linear_extrude(1.2) 
+                            {
+                                text(
+                                    text=suffix(format_fixed($slop,2),2),
+                                    size=2.5,
+                                    halign="center",
+                                    valign="center"
+                                    );
+                            }
+                        };
+                    
+                    tag("bottle-thread") {
+                        intersect() down(housing_height*0.5-1)
+                        generic_bottle_neck(pitch=3.2, neck_d=housing_inner_radius*2+1, id=0, thread_od=housing_radius*2, height=housing_height*1.5, support_d=0, spin=0, anchor=BOTTOM) 
+                        {
+                            tag("intersect") down(housing_height*0.5-2) cyl(r=housing_radius+housing_thickness, h=housing_height, anchor=BOTTOM)
+                            #if(showSlop)
+                            {
+                                fwd(10) down(0) xflip() attach(BOTTOM, TOP, inside=true) 
+                                tag("text") linear_extrude(1.2) 
+                                {
+                                    text(
+                                        text=suffix(format_fixed($slop,2),2),
+                                        size=2.5,
+                                        halign="center",
+                                        valign="center"
+                                        );
+                                }
+                            };
+                        }
+                    }
                 }
+             
+               
+        
                 
                 // switch base is right underneath the upper lip (2.2mm from where pins start)
                 up(switch_base_height) 
@@ -159,7 +220,7 @@ module choc_v1_24mm_housing() {
                 }
                 
                 // lip
-            *tag("lip") up(housing_height) cyl(center=false, l=housing_lip_height, r=housing_lip_radius, chamfer2=0.6, chamfang2=45, from_end2=true);
+            tag("lip") up(housing_height) cyl(center=false, l=housing_lip_height, r=housing_lip_radius, chamfer2=0.6, chamfang2=45, from_end2=true);
             // lip hole
             tag("remove") up(housing_height) cyl(center=false, l=housing_lip_height, r=housing_inner_radius+$slop);
             }
@@ -183,9 +244,9 @@ module choc_v1_24mm_housing() {
     }
 }
 
-module choc_v1_24mm_nut() {
+module choc_v1_24mm_nut(showSlop=false) {
     $slop=0.30;
-    echo(get_slop());
+    *echo(get_slop());
     24mm_nut_width=27.5;
     24mm_nut_inner_diameter=24.0;
     24mm_nut_height=9;
@@ -198,25 +259,52 @@ module choc_v1_24mm_nut() {
     tag("nut") union()
     {
         *tag("trap-nut") up(0) {
-            //tag("trap-thread") up(housing_height/2) trapezoidal_threaded_rod(d=24, height=housing_height, pitch=4, thread_angle=115, thread_depth=1.27, blunt_start=false);
 
             intersection(){ 
                 trapezoidal_threaded_nut(nutwidth=24mm_nut_width, id=24mm_nut_inner_diameter, height=24mm_nut_height, pitch=24mm_nut_pitch, thread_angle=115, thread_depth=1.27, blunt_start=false, bevel=true, ibevel=true, $slop=$slop, anchor=BOTTOM);
-                generic_bottle_cap(texture="ribbed",neck_od=4, thread_depth=1, wall=24mm_nut_width/2-5, height=24mm_nut_height);
+                generic_bottle_cap(texture="ribbed",neck_od=4, thread_depth=1, wall=24mm_nut_width/2-5, height=24mm_nut_height)
+                if(showSlop)
+                {
+                    diff("text") attach([LEFT,RIGHT], BACK, align=BOTTOM, inset=24mm_lip_height, overlap=-0.5) cube([8,1.5,7])
+                    up(2) attach(FRONT, FRONT, inside=true) 
+                    xflip() tag("text") linear_extrude(1.2) 
+                    {
+                        text(
+                            text=suffix(format_fixed($slop,2),2),
+                            size=3.5,
+                            halign="center",
+                            valign="center"
+                            );
+                    }
+                };
             }
             diff() {
                 tag("lip") cyl(r=24mm_lip_width/2, h=24mm_lip_height, anchor=BOTTOM);
                 tag("remove") down(5) cyl(r=24mm_nut_inner_diameter/2, h=10, anchor=BOTTOM);
 
             }
+           
         }
          
         *tag("d24-p3-nut") up(0) {
-         //tag("thread") up(housing_height/2) threaded_rod(d=24, height=housing_height, pitch=3);
 
             intersection(){ 
                 threaded_nut(nutwidth=24mm_nut_width, id=24mm_nut_inner_diameter, h=24mm_nut_height, pitch=3, blunt_start=false, bevel=true, ibevel=true, $slop=$slop, anchor=BOTTOM);
-                generic_bottle_cap(texture="knurled",neck_od=4, thread_depth=1, wall=24mm_nut_width/2-5, height=24mm_nut_height);
+                generic_bottle_cap(texture="knurled",neck_od=4, thread_depth=1, wall=24mm_nut_width/2-5, height=24mm_nut_height)
+                if(showSlop)
+                {
+                    diff("text") attach([LEFT,RIGHT], BACK, align=BOTTOM, inset=24mm_lip_height, overlap=-0.5) cube([8,1.5,7])
+                    up(2) attach(FRONT, FRONT, inside=true) 
+                    xflip() tag("text") linear_extrude(1.2) 
+                    {
+                        text(
+                            text=suffix(format_fixed($slop,2),2),
+                            size=3.5,
+                            halign="center",
+                            valign="center"
+                            );
+                    }
+                };
             }
             diff() {
                 tag("lip") cyl(r=24mm_lip_width/2, h=24mm_lip_height, anchor=BOTTOM);
@@ -226,14 +314,24 @@ module choc_v1_24mm_nut() {
         }
         
         tag("bottle-nut") up(0) {
-//            tag("bottle-thread") intersection() {
-//                down(housing_height/2-1) generic_bottle_neck(neck_d=housing_inner_radius*2+1, id=0, thread_od=housing_radius*2, height=housing_height*1.5, support_d=0, spin=-16);
-//                cyl(r=housing_radius+housing_thickness, h=housing_height, center=false);
-//            }
 
             diff() {
                 intersection() {
-                    tag("cap") generic_bottle_cap(texture="none",pitch=3.2, neck_od=housing_inner_radius*2+1+$slop, thread_od=housing_radius*2+$slop, wall=1, height=24mm_nut_height*1.5, spin=180+45);
+                    tag("cap") generic_bottle_cap(texture="none",pitch=3.2, neck_od=housing_inner_radius*2+1+$slop, thread_od=housing_radius*2+$slop, wall=1, height=24mm_nut_height*1.5, spin=180+45)
+                    if(showSlop)
+                    {
+                        diff("text") attach([LEFT,RIGHT], BACK, align=BOTTOM, inset=24mm_lip_height, overlap=0.5) cube([8,1.5,7])
+                        up(2) attach(FRONT, FRONT, inside=true) 
+                        xflip() tag("text") linear_extrude(1.2) 
+                        {
+                            text(
+                                text=suffix(format_fixed($slop,2),2),
+                                size=3.5,
+                                halign="center",
+                                valign="center"
+                                );
+                        }
+                    };
                     *tag("view-threads-helper") cyl(r=housing_radius, h=24mm_nut_height*1.5, anchor=BOTTOM);
                 }
                
@@ -247,7 +345,7 @@ module choc_v1_24mm_nut() {
             }
             // custom knurling
             diff() {
-                tag("knurling") zrot_copies([0, 45, 90, 135, 180, 225, 270, 315]) fwd(housing_radius+1.0) cylinder(h=24mm_nut_height, r=1);
+                zrot(45/2) tag("knurling") zrot_copies([0, 45, 90, 135, 180, 225, 270, 315]) fwd(housing_radius+1.0) cylinder(h=24mm_nut_height, r=1);
                 tag("remove") cyl(r=housing_radius+1, h=24mm_nut_height*1.5, anchor=BOTTOM);
 
             }
@@ -257,6 +355,6 @@ module choc_v1_24mm_nut() {
 
 
 *references();
-*choc_v1_24mm_housing();
-*choc_v1_24mm_plunger();
-choc_v1_24mm_nut();
+*choc_v1_24mm_housing(showSlop=true);
+choc_v1_24mm_plunger(showSlop=true);
+*choc_v1_24mm_nut(showSlop=true);
