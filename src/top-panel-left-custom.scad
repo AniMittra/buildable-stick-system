@@ -24,11 +24,6 @@ buttonPlacements = [
 ];
 
 insertPlacements = [
-    //[panel_x/2, panel_y/2, 0],
-    //[panel_x/2-switch_plate_offset, panel_y/2-switch_plate_offset, 0],
-    //[panel_x/2-switch_plate_offset, -panel_y/2+switch_plate_offset, 0],
-    //[-panel_x/2+switch_plate_offset, panel_y/2-switch_plate_offset, 0],
-    //[-panel_x/2+switch_plate_offset, -panel_y/2+switch_plate_offset, 0]
     [panel_x/2-switchPlateMountOffset1, panel_y/2-switchPlateMountOffset2, 0],
     [panel_x/2-switchPlateMountOffset2, panel_y/2-switchPlateMountOffset1, 0],
 
@@ -68,14 +63,15 @@ module switch_plate_mount() {
     }
 }
 
-module switch_plate() {
-    translate([-(panel_x-switch_plate_offset*2+10)/2,-(panel_y-switch_plate_offset*2+10)/2,0]) cube([panel_x-switch_plate_offset*2+10, panel_y-switch_plate_offset*2+10, switchPlateZ], center=false);
+module switch_plate(depth=1.3) {
+    translate([-(panel_x-switch_plate_offset*2+10)/2,-(panel_y-switch_plate_offset*2+10)/2, 0]) 
+    cube([panel_x-switch_plate_offset*2+10, panel_y-switch_plate_offset*2+10, depth], center=false);
 }
 
 
 module keyswitch_24mm_hole() {
-    translate([-13.8/2,-13.8/2,-15]) cube([13.8, 13.8, 30], center=false); 
-    translate([-15.25/2,-15.2/2,1.3])  cube([15.25, 15.25, 15], center=false); 
+    tag("choc_hole") translate([-13.8/2,-13.8/2,-15]) cube([13.8, 13.8, 30], center=false); 
+    tag("choc_frame") translate([-15.25/2,-15.2/2,1.3])  cube([15.25, 15.25, 15], center=false); 
     difference () {
         translate([0,0,1]) cylinder(r=big_button_radius, h=15, $fn=50, center=false);
         translate([-18/2,-18/2,0]) cube([18, 18, 15], center=false); 
@@ -88,13 +84,13 @@ module keyswitch_24mm_hole() {
 
 module keyswitch_24mm() {
     translate([0,0,panel_z/2-3+0.2]){
-        difference(){
+        diff(){
             union()
             {
                 translate([0,0,5]) cylinder(r=big_button_radius, h=24, $fn=50, center=false);
                 translate([0,0,2])cylinder(r1=small_button_radius, r2=big_button_radius, h=3, $fn=50, center=false);
                 translate([0,0,-1])cylinder(r=small_button_radius, h=3, $fn=50, center=false);
-                cube([13.8, 13.8, 30], center=true);
+                tag("remove") cube([13.8, 13.8, 30], center=true);
                 translate([-13.8/2,-50/2,-1-0.2])cube([13.8, 50, 0.2], center=false);
             }
         }
@@ -102,73 +98,102 @@ module keyswitch_24mm() {
 }
 
 module top_panel_left_custom() {
-    tag("top_panel"){
-        difference() {
-            *panel_with_raised_overhang();
+    tag("top_panel")
+    {
+        difference() 
+        {
             panel();
-
-            
-            translate([-20, panel_y/6,0]) {
-            
+            translate([-20, panel_y/6,0]) 
+            {            
                 for (i = [ 0 : len(buttonPlacements) - 1 ]) 
                 {
-                      point=buttonPlacements[i];
-                      translate([point[0],point[1],point[2]])
-                      {
-                          button_24mm_hole();
-                      }
+                    point=buttonPlacements[i];
+                    translate([point[0],point[1],point[2]])
+                    {
+                        button_24mm_hole();
+                    }
                 }
             }
             side_chopper();
         }
-
         translate([0, 0, -panel_z/2]) zflip() color("blue") switch_plate_mount();
-        
     }
 }
 
 module top_panel_left_switch_plate() {
-    tag("switch_plate") {
-        
-        translate([0, 0, switchPlateDepth+4.85/2-switchPlateZ/2]) {
-            difference() {
-            #color("blue", 0.2) switch_plate();
-            translate([-20, panel_y/6,0])
-            for (i = [ 0 : len(buttonPlacements) - 1 ]) 
+    tag("switch_plate") 
+    {    
+        translate([0, 0, switchPlateDepth+4.85/2-switchPlateZ/2]) 
+        {
+            difference() 
             {
-                  point=buttonPlacements[i];
-                  translate([point[0],point[1],point[2]])
-                  {
-                      cuboid([17.0,17.0,50]);
-                  }
-            }
-            }
-        }
-        translate([-20, panel_y/6,0]) 
-            {
-                yflip() xflip() translate([0,0,-2.2-1.2-2]) import("F:/Custom Controller/SW_Kailh_Choc_V1.stl");
-                *translate([0,0,6.8-2])rotate([180,0,0])import ("F:/Custom Controller/slimbox-2040-stickless-all-button-low-profile-fightstick-model_files/Buttons/KailhKeycap.stl");
-                *translate([0,0,6.8])rotate([-90,0,0])import ("F:/Custom Controller/choc_v1_22.5mm_v2.stl");
-
-                translate([0, 0, switchPlateDepth]) {
-                    
-                    for (i = [ 0 : len(buttonPlacements) - 1 ]) 
+                tag("plate") color("blue", 0.2) switch_plate(switchPlateZ);
+                
+                tag("switch_holes") translate([-20, panel_y/6,0])
+                for (i = [ 0 : len(buttonPlacements) - 1 ]) 
+                {
+                    point=buttonPlacements[i];
+                    translate([point[0],point[1],point[2]])
                     {
-                          point=buttonPlacements[i];
-                          translate([point[0],point[1],point[2]])
-                          {
-                              kailh_choc_single_plate();
-                          }
+                        cuboid([17.0,17.0,50]);
                     }
                 }
             }
         }
+        translate([-20, panel_y/6,0]) 
+        {
+            *tag ("references") 
+            {
+                *yflip() xflip() translate([0,0,-2.2-1.2-2]) import("F:/Custom Controller/SW_Kailh_Choc_V1.stl");
+                *translate([0,0,6.8-2])rotate([180,0,0])import ("F:/Custom Controller/slimbox-2040-stickless-all-button-low-profile-fightstick-model_files/Buttons/KailhKeycap.stl");
+                *translate([0,0,6.8])rotate([-90,0,0])import ("F:/Custom Controller/choc_v1_22.5mm_v2.stl");
+            }
+            
+            tag("single_switch_frames") translate([0, 0, switchPlateDepth]) 
+            {
+                for (i = [ 0 : len(buttonPlacements) - 1 ]) 
+                {
+                    point=buttonPlacements[i];
+                    translate([point[0],point[1],point[2]])
+                    {
+                        kailh_choc_single_plate();
+                    }
+                }
+            }
+        }
+    }
 }
 
 
+module test_switch_plate() {
+    tag("switch_plate") 
+    {    
+         back_half(150) translate([0, 0, switchPlateDepth+4.85/2-switchPlateZ/2]) 
+        {
+            diff("switch_holes") {
+//                attachable()
+                tag("plate") color("blue", 1.0) {
+                    switch_plate(1.3+1);
+                    *tag("feet") attach(BOTTOM, TOP) cube([5,5,10]);
+                }
+                
+                translate([-20, panel_y/6,0])
+                for (i = [ 0 : len(buttonPlacements) - 1 ]) 
+                {
+                    point=buttonPlacements[i];
+                    translate([point[0],point[1],point[2]])
+                    {
+                         force_tag("switch_holes") up(0) keyswitch_24mm_hole();
+                    }
+                }
+            }
+        }
+    }
+}
 
-top_panel_left_custom();
-top_panel_left_switch_plate();
+*top_panel_left_custom();
+*top_panel_left_switch_plate();
+test_switch_plate();
 
 *intersection(){
 top_panel_left_custom();
