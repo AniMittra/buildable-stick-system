@@ -63,23 +63,23 @@ module switch_plate_mount() {
     }
 }
 
-module switch_plate(depth=1.3) {
-    translate([-(panel_x-switch_plate_offset*2+10)/2,-(panel_y-switch_plate_offset*2+10)/2, 0]) 
-    cube([panel_x-switch_plate_offset*2+10, panel_y-switch_plate_offset*2+10, depth], center=false);
+module switch_plate(depth=1.3, underside=0) {
+//    translate([-(panel_x-switch_plate_offset*2+10)/2,-(panel_y-switch_plate_offset*2+10)/2, 0]) 
+    tag("switch_plate_top") cube([panel_x-switch_plate_offset*2+10, panel_y-switch_plate_offset*2+10, depth], anchor=BOTTOM);
+    tag("switch_plate_underside") cube([panel_x-switch_plate_offset*2+10, panel_y-switch_plate_offset*2+10, underside], anchor=TOP);
+
 }
 
 
 module keyswitch_24mm_hole() {
-    tag("choc_hole") translate([-13.8/2,-13.8/2,-15]) cube([13.8, 13.8, 30], center=false); 
-    tag("choc_frame") translate([-15.25/2,-15.2/2,1.3])  cube([15.25, 15.25, 15], center=false); 
+    tag("choc_hole") cube([13.8, 13.8, 30], anchor=CENTER); 
+    tag("choc_upper_base") up(switchPlateZ)  cube([15.25, 15.25, 15], anchor=BOTTOM); 
     difference () {
-        translate([0,0,1]) cylinder(r=big_button_radius, h=15, $fn=50, center=false);
-        translate([-18/2,-18/2,0]) cube([18, 18, 15], center=false); 
+        tag("circle_frame") up(switchPlateZ) cylinder(r=big_button_radius, h=15, $fn=50, anchor=BOTTOM);
+        tag("choc_frame") up(0) cube([18, 18, 15], anchor=BOTTOM); 
 
     }
-
-
-
+    tag("choc_underside") cube([18, 18, 15], anchor=TOP);
 }
 
 module keyswitch_24mm() {
@@ -168,13 +168,11 @@ module top_panel_left_switch_plate() {
 module test_switch_plate() {
     tag("switch_plate") 
     {    
-         back_half(150) translate([0, 0, switchPlateDepth+4.85/2-switchPlateZ/2]) 
+         intersect("intersect_cutout") back_half(150) up(switchPlateDepth+4.85/2-switchPlateZ/2) 
         {
             diff("switch_holes") {
-//                attachable()
                 tag("plate") color("blue", 1.0) {
-                    switch_plate(1.3+1);
-                    *tag("feet") attach(BOTTOM, TOP) cube([5,5,10]);
+                    switch_plate(switchPlateZ+1,3);
                 }
                 
                 translate([-20, panel_y/6,0])
@@ -184,6 +182,18 @@ module test_switch_plate() {
                     translate([point[0],point[1],point[2]])
                     {
                          force_tag("switch_holes") up(0) keyswitch_24mm_hole();
+                    }
+                }
+            }
+            
+            tag("intersect_cutout") {
+                translate([-20, panel_y/6,0])
+                for (i = [ 0 : len(buttonPlacements) - 1 ]) 
+                {
+                    point=buttonPlacements[i];
+                    translate([point[0],point[1],point[2]])
+                    {
+                         up(0) cyl(d=30+5, h=50);
                     }
                 }
             }
