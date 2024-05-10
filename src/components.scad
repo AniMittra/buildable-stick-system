@@ -208,6 +208,11 @@ module base_bottom_panel() {
 	mirror([0, 0, 1]) base_panel();
 }
 
+module middle_base_bottom_panel() {
+	mirror([0, 0, 1]) middle_base_panel();
+}
+
+
 module panel() {
 	difference() {
 		base_panel();
@@ -225,6 +230,13 @@ module bottom_panel() {
 	difference() {
 		base_bottom_panel();
 		mirror([0, 0, 1]) panel_holes();
+	}
+}
+
+module middle_bottom_panel() {
+	difference() {
+		middle_base_bottom_panel();
+		mirror([0, 0, 1]) mid_panel_holes();
 	}
 }
 

@@ -14,13 +14,25 @@ switchPlateMountOffset2=12.5;
 
 
 buttonPlacements = [
-    [0,0,0],
-    [29.5, 0, 0],
-    [29.5+26.3, -12.9, 0],
-    [-29.5, -8, 0],
-    [36, 28, 0],
-    [29.5+26.3+15.5, -65.2, 0],
-    [26.3+15.5, -65.2+8, 0]
+//    [0,0,0],
+//    [29.5, 0, 0],
+//    [29.5+26.3, -12.9, 0],
+//    [-29.5, -8, 0],
+//    [36, 28, 0],
+//    [29.5+26.3+15.5, -65.2, 0],
+//    [26.3+15.5, -65.2+8, 0]
+    
+    //from psd
+    // directions
+    [88.8, 180.49],
+    [56.4, 155],
+    [83.4, 154.69],
+    [108.4, 144.1],
+    // pinky
+    [30.99, 150.1],
+    // thumb
+    [125.49, 94.8],
+    [97.69, 104.69]
 ];
 
 insertPlacements = [
@@ -103,12 +115,12 @@ module top_panel_left_custom() {
         difference() 
         {
             panel();
-            translate([-20, panel_y/6,0]) 
+            translate([-panel_x/2+(24/2),-panel_y/2-(24/2),0]) 
             {            
                 for (i = [ 0 : len(buttonPlacements) - 1 ]) 
                 {
                     point=buttonPlacements[i];
-                    translate([point[0],point[1],point[2]])
+                    translate([point[0],point[1],0])
                     {
                         button_24mm_hole();
                     }
@@ -129,18 +141,18 @@ module top_panel_left_switch_plate() {
             {
                 tag("plate") color("blue", 0.2) switch_plate(switchPlateZ);
                 
-                tag("switch_holes") translate([-20, panel_y/6,0])
+                tag("switch_holes") translate([-panel_x/2+(24/2),-panel_y/2-(24/2),0])
                 for (i = [ 0 : len(buttonPlacements) - 1 ]) 
                 {
                     point=buttonPlacements[i];
-                    translate([point[0],point[1],point[2]])
+                    translate([point[0],point[1],0])
                     {
                         cuboid([17.0,17.0,50]);
                     }
                 }
             }
         }
-        translate([-20, panel_y/6,0]) 
+        translate([-panel_x/2+(24/2),-panel_y/2-(24/2),0]) 
         {
             *tag ("references") 
             {
@@ -154,7 +166,7 @@ module top_panel_left_switch_plate() {
                 for (i = [ 0 : len(buttonPlacements) - 1 ]) 
                 {
                     point=buttonPlacements[i];
-                    translate([point[0],point[1],point[2]])
+                    translate([point[0],point[1],0])
                     {
                         kailh_choc_single_plate();
                     }
@@ -175,11 +187,11 @@ module test_switch_plate() {
                     switch_plate(switchPlateZ+1,3);
                 }
                 
-                translate([-20, panel_y/6,0])
+                translate([-panel_x/2+(24/2),-panel_y/2-(24/2),0]) 
                 for (i = [ 0 : len(buttonPlacements) - 1 ]) 
                 {
                     point=buttonPlacements[i];
-                    translate([point[0],point[1],point[2]])
+                    translate([point[0],point[1],0])
                     {
                          force_tag("switch_holes") up(0) keyswitch_24mm_hole();
                     }
@@ -187,11 +199,11 @@ module test_switch_plate() {
             }
             
             tag("intersect_cutout") {
-                translate([-20, panel_y/6,0])
+                translate([-panel_x/2+(24/2),-panel_y/2-(24/2),0]) 
                 for (i = [ 0 : len(buttonPlacements) - 1 ]) 
                 {
                     point=buttonPlacements[i];
-                    translate([point[0],point[1],point[2]])
+                    translate([point[0],point[1],0])
                     {
                          up(0) cyl(d=30+5, h=50);
                     }
@@ -201,9 +213,9 @@ module test_switch_plate() {
     }
 }
 
-*top_panel_left_custom();
+top_panel_left_custom();
 *top_panel_left_switch_plate();
-test_switch_plate();
+*test_switch_plate();
 
 *intersection(){
 top_panel_left_custom();
