@@ -43,6 +43,7 @@ module top_panel_right_custom() {
         {
             panel();
             translate([-panel_x/2+(24/2),-panel_y/2-(24/2),0]) 
+            fwd(buttonPlacementAdjustment)
             {            
                 for (i = [ 0 : len(buttonPlacements) - 1 ]) 
                 {

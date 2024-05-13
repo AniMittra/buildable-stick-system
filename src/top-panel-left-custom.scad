@@ -9,19 +9,11 @@ include <kailhsocket.scad>
 
 switchPlateDepth=-6.8;
 switchPlateZ=1.3;
-switchPlateMountOffset1=25;
-switchPlateMountOffset2=12.5;
+switchPlateMountOffset1=27.5;
+switchPlateMountOffset2=15.0;
 
 
-buttonPlacements = [
-//    [0,0,0],
-//    [29.5, 0, 0],
-//    [29.5+26.3, -12.9, 0],
-//    [-29.5, -8, 0],
-//    [36, 28, 0],
-//    [29.5+26.3+15.5, -65.2, 0],
-//    [26.3+15.5, -65.2+8, 0]
-    
+buttonPlacements = [    
     //from psd
     // directions
     [88.8, 180.49],
@@ -47,6 +39,12 @@ insertPlacements = [
 
     [-panel_x/2+switchPlateMountOffset1, -panel_y/2+switchPlateMountOffset2, 0],
     [-panel_x/2+switchPlateMountOffset2, -panel_y/2+switchPlateMountOffset1, 0],
+    
+    [panel_x/2-switchPlateMountOffset2, 5, 0],
+    [panel_x/2-switchPlateMountOffset2, -5, 0],
+    
+    [-panel_x/2+switchPlateMountOffset2, 5, 0],
+    [-panel_x/2+switchPlateMountOffset2, -5, 0],
     
     
 ];
@@ -76,10 +74,25 @@ module switch_plate_mount() {
 }
 
 module switch_plate(depth=1.3, underside=0) {
-//    translate([-(panel_x-switch_plate_offset*2+10)/2,-(panel_y-switch_plate_offset*2+10)/2, 0]) 
-    tag("switch_plate_top") cube([panel_x-switch_plate_offset*2+10, panel_y-switch_plate_offset*2+10, depth], anchor=BOTTOM);
-    tag("switch_plate_underside") cube([panel_x-switch_plate_offset*2+10, panel_y-switch_plate_offset*2+10, underside], anchor=TOP);
-
+    diff("remove") 
+    {
+        tag("switch_plate_top") cube([panel_x-switch_plate_offset*2, panel_y-switch_plate_offset*2, depth], anchor=BOTTOM);
+        tag("switch_plate_underside") cube([panel_x-switch_plate_offset*2, panel_y-switch_plate_offset*2, underside], anchor=TOP) 
+        {
+            // corner cutouts
+            tag("remove") align(CENTER, [RIGHT+FRONT, LEFT+FRONT, RIGHT+BACK, LEFT+BACK]) cube([frame_mount_column_width-panel_support_width,frame_mount_column_width-panel_support_width,50], anchor=CENTER);
+            // corner holes
+            tag("remove") 
+            for (i = [ 0 : len(insertPlacements) - 1 ]) 
+            {
+                point=insertPlacements[i];
+                translate([point[0],point[1],point[2]])
+                {
+                    m3_hole();
+                }
+            }
+        }
+    }
 }
 
 
@@ -116,6 +129,7 @@ module top_panel_left_custom() {
         {
             panel();
             translate([-panel_x/2+(24/2),-panel_y/2-(24/2),0]) 
+            fwd(buttonPlacementAdjustment)
             {            
                 for (i = [ 0 : len(buttonPlacements) - 1 ]) 
                 {
@@ -139,9 +153,10 @@ module top_panel_left_switch_plate() {
         {
             difference() 
             {
-                tag("plate") color("blue", 0.2) switch_plate(switchPlateZ);
+                tag("plate") color("blue", 0.5) switch_plate(switchPlateZ);
                 
                 tag("switch_holes") translate([-panel_x/2+(24/2),-panel_y/2-(24/2),0])
+                fwd(buttonPlacementAdjustment)
                 for (i = [ 0 : len(buttonPlacements) - 1 ]) 
                 {
                     point=buttonPlacements[i];
@@ -153,6 +168,7 @@ module top_panel_left_switch_plate() {
             }
         }
         translate([-panel_x/2+(24/2),-panel_y/2-(24/2),0]) 
+        fwd(buttonPlacementAdjustment)
         {
             *tag ("references") 
             {
@@ -177,17 +193,19 @@ module top_panel_left_switch_plate() {
 }
 
 
-module test_switch_plate() {
+module top_panel_left_switch_plate_cutout() {
     tag("switch_plate") 
     {    
-         intersect("intersect_cutout") back_half(150) up(switchPlateDepth+4.85/2-switchPlateZ/2) 
+         intersect("intersect_cutout")
+         back_half(500) up(switchPlateDepth+4.85/2-switchPlateZ/2) 
         {
             diff("switch_holes") {
                 tag("plate") color("blue", 1.0) {
-                    switch_plate(switchPlateZ+1,3);
+                    #switch_plate(switchPlateZ+1,3);
                 }
                 
                 translate([-panel_x/2+(24/2),-panel_y/2-(24/2),0]) 
+                fwd(buttonPlacementAdjustment)
                 for (i = [ 0 : len(buttonPlacements) - 1 ]) 
                 {
                     point=buttonPlacements[i];
@@ -200,6 +218,7 @@ module test_switch_plate() {
             
             tag("intersect_cutout") {
                 translate([-panel_x/2+(24/2),-panel_y/2-(24/2),0]) 
+                fwd(buttonPlacementAdjustment)
                 for (i = [ 0 : len(buttonPlacements) - 1 ]) 
                 {
                     point=buttonPlacements[i];
@@ -213,9 +232,9 @@ module test_switch_plate() {
     }
 }
 
-top_panel_left_custom();
+*top_panel_left_custom();
 *top_panel_left_switch_plate();
-*test_switch_plate();
+top_panel_left_switch_plate_cutout();
 
 *intersection(){
 top_panel_left_custom();

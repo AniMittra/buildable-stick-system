@@ -11,6 +11,10 @@ include <BOSL2/threading.scad>
 include <BOSL2/screws.scad>
 include <BOSL2/bottlecaps.scad>
 
+module m3_hole() {
+	cylinder(r=m3_bolt_radius, h=100, $fn=50, center=true);
+}
+
 module m4_hole() {
 	cylinder(r=m4_bolt_radius, h=100, $fn=50, center=true);
 }

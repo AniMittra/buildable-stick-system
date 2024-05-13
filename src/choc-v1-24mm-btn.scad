@@ -258,31 +258,50 @@ module choc_v1_24mm_nut(showSlop=false) {
 
     tag("nut") union()
     {
-        *tag("trap-nut") up(0) {
+        tag("trap-nut") up(0) {
 
-            intersection(){ 
+            intersection()
+            { 
                 trapezoidal_threaded_nut(nutwidth=24mm_nut_width, id=24mm_nut_inner_diameter, height=24mm_nut_height, pitch=24mm_nut_pitch, thread_angle=115, thread_depth=1.27, blunt_start=false, bevel=true, ibevel=true, $slop=$slop, anchor=BOTTOM);
-                generic_bottle_cap(texture="ribbed",neck_od=4, thread_depth=1, wall=24mm_nut_width/2-5, height=24mm_nut_height)
-                if(showSlop)
-                {
-                    diff("text") attach([LEFT,RIGHT], BACK, align=BOTTOM, inset=24mm_lip_height, overlap=-0.5) cube([8,1.5,7])
-                    up(2) attach(FRONT, FRONT, inside=true) 
-                    xflip() tag("text") linear_extrude(1.2) 
-                    {
-                        text(
-                            text=suffix(format_fixed($slop,2),2),
-                            size=3.5,
-                            halign="center",
-                            valign="center"
-                            );
-                    }
-                };
+                tag("intersect_cyl") cylinder(r=13.5, h=100);
+                
             }
+            
+            tag("outer-trap-nut") diff() 
+                {
+                    tag("base") cyl(r=housing_radius+1.5, h=24mm_nut_height*1.0, anchor=BOTTOM)
+                     if(showSlop)
+                    {
+                        diff("text") 
+                        attach([LEFT,RIGHT], BACK, align=BOTTOM, inset=24mm_lip_height, overlap=0.4) 
+                        cube([8,1.5,7])
+                        up(2) attach(FRONT, FRONT, inside=true) 
+                        xflip() tag("text") linear_extrude(1.2) 
+                        {
+                            text(
+                                text=suffix(format_fixed($slop,2),2),
+                                size=3.5,
+                                halign="center",
+                                valign="center"
+                                );
+                        }
+                    };
+                     // custom knurling
+                    zrot(45/2) tag("knurling") zrot_copies([0, 45, 90, 135, 180, 225, 270, 315]) fwd(housing_radius+1.0) cylinder(h=24mm_nut_height, r=1);
+                    tag("remove") cyl(r=housing_radius+1.5, h=24mm_nut_height*5.0, anchor=CENTER);
+                }
+                           
+
+            
+           
+        
+            
             diff() {
                 tag("lip") cyl(r=24mm_lip_width/2, h=24mm_lip_height, anchor=BOTTOM);
                 tag("remove") down(5) cyl(r=24mm_nut_inner_diameter/2, h=10, anchor=BOTTOM);
 
             }
+
            
         }
          
@@ -313,7 +332,7 @@ module choc_v1_24mm_nut(showSlop=false) {
             }
         }
         
-        tag("bottle-nut") up(0) {
+        *tag("bottle-nut") up(0) {
 
             diff() {
                 intersection() {
@@ -356,5 +375,5 @@ module choc_v1_24mm_nut(showSlop=false) {
 
 *references();
 *choc_v1_24mm_housing(showSlop=true);
-choc_v1_24mm_plunger(showSlop=true);
-*choc_v1_24mm_nut(showSlop=true);
+*choc_v1_24mm_plunger(showSlop=true);
+choc_v1_24mm_nut(showSlop=true);

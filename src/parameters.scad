@@ -13,6 +13,8 @@ m2_screw_selftap_radius = 0.95;
 
 // M3
 m3_screw_selftap_radius = 1.3;
+m3_bolt_radius = 1.5 + hole_tolerance;
+
 
 // M4
 m4_bolt_radius = 2 + hole_tolerance;
@@ -24,9 +26,6 @@ small_button_radius = 12 + hole_tolerance;
 
 // 30mm button
 big_button_radius = 15 + hole_tolerance;
-
-// switch plate offset from corners of frame
-switch_plate_offset = 20;
 
 // JLF mount dimensions
 lever_mount_x = 53;
@@ -108,4 +107,6 @@ jumbo_decorative_radius_scale = 2;
 
 
 switchPlateDepth=-6.8;
-
+buttonPlacementAdjustment=20;
+// switch plate offset from corners of frame (frame width + tolerance)
+switch_plate_offset = panel_support_width+2.5;
