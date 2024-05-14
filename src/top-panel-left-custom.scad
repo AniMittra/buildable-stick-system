@@ -8,10 +8,10 @@ include <components.scad>
 include <kailhsocket.scad>
 
 switchPlateDepth=-6.8;
-switchPlateZ=1.3;
 switchPlateMountOffset1=27.5;
 switchPlateMountOffset2=15.0;
 
+buttonsOffset=[-panel_x/2+(24/2)-12,-panel_y/2-(24/2)-24,0];
 
 buttonPlacements = [    
     //from psd
@@ -49,6 +49,16 @@ insertPlacements = [
     
 ];
 
+switchPlateHoles = [
+//		translate([panel_to_frame_point_x, panel_to_frame_point_y, 0]) frame_hex_bolt_hole();
+
+    [panel_to_frame_point_x, panel_to_frame_point_y, 0],
+    [-panel_to_frame_point_x, panel_to_frame_point_y, 0],
+    [panel_to_frame_point_x, -panel_to_frame_point_y, 0],
+    [-panel_to_frame_point_x, -panel_to_frame_point_y, 0],
+    
+];
+
 module button_24mm_hole() {
 	cylinder(r=small_button_radius, h=100, $fn=50, center=true);
 	// carve out space for snap-ins, leave 3mm
@@ -80,15 +90,15 @@ module switch_plate(depth=1.3, underside=0) {
         tag("switch_plate_underside") cube([panel_x-switch_plate_offset*2, panel_y-switch_plate_offset*2, underside], anchor=TOP) 
         {
             // corner cutouts
-            tag("remove") align(CENTER, [RIGHT+FRONT, LEFT+FRONT, RIGHT+BACK, LEFT+BACK]) cube([frame_mount_column_width-panel_support_width,frame_mount_column_width-panel_support_width,50], anchor=CENTER);
+            *tag("remove") align(CENTER, [RIGHT+FRONT, LEFT+FRONT, RIGHT+BACK, LEFT+BACK]) cube([frame_mount_column_width-panel_support_width,frame_mount_column_width-panel_support_width,50], anchor=CENTER);
             // corner holes
             tag("remove") 
-            for (i = [ 0 : len(insertPlacements) - 1 ]) 
+            for (i = [ 0 : len(switchPlateHoles) - 1 ]) 
             {
-                point=insertPlacements[i];
+                point=switchPlateHoles[i];
                 translate([point[0],point[1],point[2]])
                 {
-                    m3_hole();
+                    m4_hole();
                 }
             }
         }
@@ -127,8 +137,10 @@ module top_panel_left_custom() {
     {
         difference() 
         {
-            panel();
-            translate([-panel_x/2+(24/2),-panel_y/2-(24/2),0]) 
+//            panel();
+            panel_with_raised_overhang();
+            
+            translate(buttonsOffset) 
             fwd(buttonPlacementAdjustment)
             {            
                 for (i = [ 0 : len(buttonPlacements) - 1 ]) 
@@ -142,49 +154,59 @@ module top_panel_left_custom() {
             }
             side_chopper();
         }
-        translate([0, 0, -panel_z/2]) zflip() color("blue") switch_plate_mount();
+        *translate([0, 0, -panel_z/2]) zflip() color("blue") switch_plate_mount();
     }
 }
 
-module top_panel_left_switch_plate() {
+module top_panel_left_switch_plate(references=false) {
     tag("switch_plate") 
     {    
-        translate([0, 0, switchPlateDepth+4.85/2-switchPlateZ/2]) 
+        down(switchPlateZ+panel_z*1.5) 
         {
             difference() 
             {
-                tag("plate") color("blue", 0.5) switch_plate(switchPlateZ);
+                tag("plate") color("blue", 1) switch_plate(switchPlateZ);
                 
-                tag("switch_holes") translate([-panel_x/2+(24/2),-panel_y/2-(24/2),0])
+                tag("switch_holes") translate(buttonsOffset)
                 fwd(buttonPlacementAdjustment)
                 for (i = [ 0 : len(buttonPlacements) - 1 ]) 
                 {
                     point=buttonPlacements[i];
                     translate([point[0],point[1],0])
                     {
-                        cuboid([17.0,17.0,50]);
+                        cuboid([17.8,17.8,50]);
                     }
                 }
             }
         }
-        translate([-panel_x/2+(24/2),-panel_y/2-(24/2),0]) 
+        
+        translate(buttonsOffset) 
         fwd(buttonPlacementAdjustment)
-        {
-            *tag ("references") 
-            {
-                *yflip() xflip() translate([0,0,-2.2-1.2-2]) import("F:/Custom Controller/SW_Kailh_Choc_V1.stl");
-                *translate([0,0,6.8-2])rotate([180,0,0])import ("F:/Custom Controller/slimbox-2040-stickless-all-button-low-profile-fightstick-model_files/Buttons/KailhKeycap.stl");
-                *translate([0,0,6.8])rotate([-90,0,0])import ("F:/Custom Controller/choc_v1_22.5mm_v2.stl");
-            }
-            
-            tag("single_switch_frames") translate([0, 0, switchPlateDepth]) 
+        {    
+            tag("single_switch_frames") translate([0, 0, 0]) 
             {
                 for (i = [ 0 : len(buttonPlacements) - 1 ]) 
                 {
                     point=buttonPlacements[i];
-                    translate([point[0],point[1],0])
+                    translate([point[0],point[1], -4.85-2.2])
                     {
-                        kailh_choc_single_plate();
+                        kailh_choc_single_frame(false, 2.5);
+                        down(0.45) 
+                        diff() prismoid(size1=[25,25], size2=[20,20], h=2.5+0.45, anchor=BOTTOM) {
+                            // cutout
+                            tag("remove") cube([17.8,17.8,10], anchor=CENTER);
+                            }
+                    }
+                    
+                    if(i==0 && references==true) tag("references") 
+                    {
+                        translate([point[0],point[1],2.2+switchPlateDepth]) yflip() xflip()  import("F:/Custom Controller/SW_Kailh_Choc_V1.stl");
+                        
+                       
+                        *translate([point[0]-11.25, point[1]-11.25, -switchPlateDepth]) xrot(-90) import ("F:/Custom Controller/choc_v1_22.5mm_v2.stl");
+                        
+                        
+                       translate([point[0],point[1],-switchPlateDepth]) zflip() import ("F:/Custom Controller/slimbox-2040-stickless-all-button-low-profile-fightstick-model_files/Buttons/KailhKeycap.stl");
                     }
                 }
             }
@@ -232,9 +254,9 @@ module top_panel_left_switch_plate_cutout() {
     }
 }
 
-*top_panel_left_custom();
-*top_panel_left_switch_plate();
-top_panel_left_switch_plate_cutout();
+top_panel_left_custom();
+top_panel_left_switch_plate(references=true);
+*top_panel_left_switch_plate_cutout();
 
 *intersection(){
 top_panel_left_custom();

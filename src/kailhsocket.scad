@@ -4,7 +4,7 @@ include <components.scad>
 $fn=60;
 
 //hotswap
-$slop=0.2;
+$slop=0.0;
 
 cyl_h=10.05;
 cyl_d=3+$slop;
@@ -108,12 +108,10 @@ module kailh_hot_swap_choc(extend_cables=0){
     }
 }
 
-module kailh_choc_single_plate(showFeet=false) {
+module kailh_choc_single_plate(showFeet=false, hotSwapEdge=false) {
     diff("remove"){
         tag("switch-housing") attachable() {            
-            // main cube box
-//            translate([-switch_frame_x/2, -switch_frame_y/2, 0])
-            tag("main-housing")  color("blue", 0.5)
+            tag("main-housing")  color("blue", 1)
             cube([switch_frame_x,switch_frame_y,switch_frame_z], anchor=BOTTOM)
             if(showFeet)
             {
@@ -137,7 +135,7 @@ module kailh_choc_single_plate(showFeet=false) {
             
             // framing border 
             union() {
-                tag("switch-framing") up(switch_frame_z) color("orange", 0.5)
+                tag("switch-framing") up(switch_frame_z) color("orange",1)
                 difference() {
                     cuboid([switch_frame_x,switch_frame_y,switch_frame_inner_z], anchor=BOTTOM);
                     cuboid([switch_frame_inner_x,switch_frame_inner_y,10], anchor=BOTTOM);
@@ -154,16 +152,60 @@ module kailh_choc_single_plate(showFeet=false) {
         tag("remove") translate([-switch_x/2,-switch_y/2,switch_frame_z+switch_upper_lip_z]) kailh_choc_switch();
         // subtract the hotswap holes and recess
         tag("remove") kailh_hot_swap_choc(0);
-        // let's not leave room for 3d print issue with hot swap edge
-        *tag("remove") {
-            translate([0,-2.5,0]) cuboid([switch_frame_x,switch_frame_y/2,clip_z], anchor=BOTTOM+BACK);
-        }
         
+        if (hotSwapEdge) {
+            // let's not leave room for 3d print issue with hot swap edge
+            tag("remove") {
+                translate([0,-2.5,0]) cuboid([switch_frame_x,switch_frame_y/2,clip_z], anchor=BOTTOM+BACK);
+            }
+        }        
+
+    }
+}
+
+module kailh_choc_single_frame(showFeet=false, switchFrameHeight=switch_frame_z) {
+    diff("remove"){
+        tag("switch-housing") attachable() {            
+            tag("main-housing")  color("blue", 1)
+            up(switch_frame_z)
+            cube([switch_frame_x,switch_frame_y,switchFrameHeight], anchor=TOP)
+            if(showFeet)
+            {
+                diff("text")
+                attach([LEFT,RIGHT],BACK,align=BOTTOM)
+                cube([switch_frame_x,5,switch_frame_z])
+                up(1.5) xflip() attach(FRONT, TOP, inside=true) 
+                tag("text") linear_extrude(1.2) 
+                {
+                    text(
+                        text=format_fixed($slop,2),
+                        size=3.5,
+                        halign="center",
+                        valign="center"
+                        );
+                }
+            }            
+        
+            // framing border 
+            union() {
+                tag("switch-framing") up(switch_frame_z) color("orange",1)
+                difference() {
+                    cuboid([switch_frame_x,switch_frame_y,switch_frame_inner_z], anchor=BOTTOM);
+                    cuboid([switch_frame_inner_x,switch_frame_inner_y,10], anchor=BOTTOM);
+                }
+                
+            }
+        }
+        // recess from the top so keyswitch can sit in
+        tag("remove") cube([switch_recess_x,switch_recess_y, 50], anchor=CENTER);
+        // create space for the bottom lip to clip in to
+        tag("remove") translate([-switch_lower_lip_x/2, -switch_lower_lip_y/2, plastic_pin_z]) cube([switch_lower_lip_x,switch_lower_lip_y,switch_lower_lip_z]);
+  
 
     }
 }
 
 //kailh_choc_switch();
 //translate([0,0,2.2+0.8/2]) rotate([0,0,180]) import("F:/Custom Controller/SW_Kailh_Choc_V1.stl");
-//kailh_choc_single_plate(showFeet=true);
+//kailh_choc_single_frame();
 //#kailh_hot_swap_choc(0);

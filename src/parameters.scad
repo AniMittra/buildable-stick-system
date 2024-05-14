@@ -38,12 +38,12 @@ lever_plate_hole = 12;
 
 // case dimensions
 // base frame box. reminder: top of inside (including mounts) is chopped by panel_z for plates
-frame_x = 168;
-frame_y = 198;
+frame_x = 158-3; //168
+frame_y = 169-3; //200
 frame_z = 50;
 
 // middle piece dimensions
-mid_frame_x = 88;
+mid_frame_x = 120+8; //88
 
 /*
 frame_x = 233;
@@ -82,7 +82,7 @@ mid_panel_x = mid_frame_x - (frame_wall * 2);
 
 // how much the top plate x/y is expanded to overhang the frame
 // note that this is relative to the top plate (so the wall is added back)
-panel_overhang_amount = 8.5;
+panel_overhang_amount = 0; //8.5
 overhang_panel_x = panel_x + (frame_wall * 2) + (panel_overhang_amount * 2);
 overhang_panel_y = panel_y + (frame_wall * 2) + (panel_overhang_amount * 2);
 // mid overhang
@@ -107,6 +107,7 @@ jumbo_decorative_radius_scale = 2;
 
 
 switchPlateDepth=-6.8;
+switchPlateZ=1.5;
 buttonPlacementAdjustment=20;
 // switch plate offset from corners of frame (frame width + tolerance)
-switch_plate_offset = panel_support_width+2.5;
+switch_plate_offset=0; //panel_support_width+2.5;

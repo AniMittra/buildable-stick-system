@@ -12,6 +12,7 @@ switchPlateZ=1.3;
 switchPlateMountOffset1=25;
 switchPlateMountOffset2=12.5;
 
+buttonsOffset=[-panel_x/2+(24/2)+12,-panel_y/2-(24/2)-24,0];
 
 buttonPlacements = [
     //from psd
@@ -41,8 +42,8 @@ module top_panel_right_custom() {
     {
         difference() 
         {
-            panel();
-            translate([-panel_x/2+(24/2),-panel_y/2-(24/2),0]) 
+            panel_with_raised_overhang();
+            translate(buttonsOffset) 
             fwd(buttonPlacementAdjustment)
             {            
                 for (i = [ 0 : len(buttonPlacements) - 1 ]) 

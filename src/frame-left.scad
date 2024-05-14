@@ -6,6 +6,18 @@
 include <parameters.scad>
 include <components.scad>
 
+module frame_connection_holes() {
+	translate([frame_x/2, (frame_y/4)+5, (frame_z/4)]) rotate([0, 90, 0]) m4_hole();
+	translate([frame_x/2, (frame_y/4)+5, -(frame_z/4)]) rotate([0, 90, 0]) m4_hole();
+	translate([frame_x/2, (frame_y/4)-15, (frame_z/4)]) rotate([0, 90, 0]) m4_hole();
+	translate([frame_x/2, (frame_y/4)-15, -(frame_z/4)]) rotate([0, 90, 0]) m4_hole();
+
+	translate([frame_x/2, -((frame_y/4)+5), (frame_z/4)]) rotate([0, 90, 0]) m4_hole();
+	translate([frame_x/2, -((frame_y/4)+5), -(frame_z/4)]) rotate([0, 90, 0]) m4_hole();
+	translate([frame_x/2, -((frame_y/4)-15), (frame_z/4)]) rotate([0, 90, 0]) m4_hole();
+	translate([frame_x/2, -((frame_y/4)-15), -(frame_z/4)]) rotate([0, 90, 0]) m4_hole();
+}
+
 module base_left_frame() {
 	difference() {
 		frame();

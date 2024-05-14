@@ -101,10 +101,12 @@ module keyswitch_24mm() {
 }
 
 module top_panel_left_custom() {
+    
+    right(200) panel();
+    
     tag("top_panel"){
         difference() {
-            *panel_with_raised_overhang();
-            panel();
+            panel_with_raised_overhang();
 
             
             translate([-20, panel_y/6,0]) {
