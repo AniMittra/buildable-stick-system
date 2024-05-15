@@ -43,7 +43,7 @@ frame_y = 169-3; //200
 frame_z = 50;
 
 // middle piece dimensions
-mid_frame_x = 120+8; //88
+mid_frame_x = 130+8; //88
 
 /*
 frame_x = 233;

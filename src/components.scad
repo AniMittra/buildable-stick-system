@@ -522,7 +522,7 @@ module mid_frame() {
 	difference() {
 		base_mid_frame();
 		translate([0, 0, frame_z/2]) scale([1, 1, 2]) base_panel();
-		translate([0, 0, -frame_z/2]) scale([1, 1, 2]) bottom_panel();
+		translate([0, 0, -frame_z/2]) scale([1, 1, 2]) middle_bottom_panel();
 		translate([mid_panel_to_frame_point_x, panel_to_frame_point_y, 0]) frame_hex_bolt_hole();
 		translate([-mid_panel_to_frame_point_x, panel_to_frame_point_y, 0]) frame_hex_bolt_hole();
 		translate([mid_panel_to_frame_point_x, -panel_to_frame_point_y, 0]) frame_hex_bolt_hole();

@@ -36,7 +36,7 @@ use <bottom-panel-inset-middle-custom.scad>
 
 //xrot(45) yrot(-90)
 tag("3-panel-design") {
-    #tag("top_panel") color("brown") {
+    tag("top_panel") color("brown") {
         tag("left") translate([-panel_x/2-mid_panel_x/2,0,frame_z/2-panel_z/2+switchPlateZ]) top_panel_left_custom();
         *tag("middle") translate([0,0,frame_z/2-panel_z/2]) top_panel_middle_custom();
         *tag("right") translate([panel_x/2+mid_panel_x/2,0,frame_z/2-panel_z/2]) top_panel_right_custom();
