@@ -21,10 +21,10 @@ buttonPlacements = [
 
 
 switchPlateHoles = [
-    [panel_to_frame_point_x, panel_to_frame_point_y, 0],
-    [-panel_to_frame_point_x, panel_to_frame_point_y, 0],
-    [panel_to_frame_point_x, -panel_to_frame_point_y, 0],
-    [-panel_to_frame_point_x, -panel_to_frame_point_y, 0],
+    [mid_panel_to_frame_point_x, panel_to_frame_point_y, 0],
+    [-mid_panel_to_frame_point_x, panel_to_frame_point_y, 0],
+    [mid_panel_to_frame_point_x, -panel_to_frame_point_y, 0],
+    [-mid_panel_to_frame_point_x, -panel_to_frame_point_y, 0],
 ];
 
 module middle_switch_plate(depth=1.3, underside=0) {
@@ -57,7 +57,6 @@ module top_panel_middle_switch_plate(references=false) {
                 tag("plate") color("blue", 1) middle_switch_plate(switchPlateZ);
                 
                 tag("switch_holes") translate(buttonsOffset)
-                fwd(buttonPlacementAdjustment)
                 for (i = [ 0 : len(buttonPlacements) - 1 ]) 
                 {
                     point=buttonPlacements[i];
@@ -66,11 +65,20 @@ module top_panel_middle_switch_plate(references=false) {
                         cuboid([17.8,17.8,50]);
                     }
                 }
+                
+                tag("pcb_cutout") {
+                    translate([0, 0, -(panel_z/2) - 3])
+                    cuboid([60,120,50]);
+                }
+                
+                tag("oled_cutout") {
+                    translate([42,panel_y/2-50,0]) 
+                    cuboid([36,34,50]);
+                }
             }
         }
         
         translate(buttonsOffset) 
-        fwd(buttonPlacementAdjustment)
         {    
             tag("single_switch_frames") translate([0, 0, 0]) 
             {
@@ -139,6 +147,6 @@ module top_panel_middle_custom() {
     }
 }
 
-top_panel_middle_custom();
-*top_panel_middle_switch_plate(references=true);
+*top_panel_middle_custom();
+top_panel_middle_switch_plate(references=false);
 

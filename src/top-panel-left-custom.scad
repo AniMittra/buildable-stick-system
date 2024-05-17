@@ -50,8 +50,6 @@ insertPlacements = [
 ];
 
 switchPlateHoles = [
-//		translate([panel_to_frame_point_x, panel_to_frame_point_y, 0]) frame_hex_bolt_hole();
-
     [panel_to_frame_point_x, panel_to_frame_point_y, 0],
     [-panel_to_frame_point_x, panel_to_frame_point_y, 0],
     [panel_to_frame_point_x, -panel_to_frame_point_y, 0],
@@ -254,8 +252,8 @@ module top_panel_left_switch_plate_cutout() {
     }
 }
 
-top_panel_left_custom();
-top_panel_left_switch_plate(references=true);
+*top_panel_left_custom();
+top_panel_left_switch_plate(references=false);
 *top_panel_left_switch_plate_cutout();
 
 *intersection(){
