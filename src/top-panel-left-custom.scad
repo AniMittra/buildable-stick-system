@@ -146,7 +146,8 @@ module top_panel_left_custom() {
                     point=buttonPlacements[i];
                     translate([point[0],point[1],0])
                     {
-                        button_24mm_hole();
+                        *button_24mm_hole();
+                        button_24mm_keycap_hole();
                     }
                 }
             }
@@ -252,7 +253,7 @@ module top_panel_left_switch_plate_cutout() {
     }
 }
 
-*top_panel_left_custom();
+top_panel_left_custom();
 top_panel_left_switch_plate(references=false);
 *top_panel_left_switch_plate_cutout();
 

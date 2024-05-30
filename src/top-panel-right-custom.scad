@@ -137,7 +137,9 @@ module top_panel_right_custom() {
                     point=buttonPlacements[i];
                     translate([point[0],point[1],0])
                     {
-                        button_24mm_hole();
+                        *button_24mm_hole();
+                        button_24mm_keycap_hole();
+
                     }
                 }
             }

@@ -23,9 +23,11 @@ m4_bolt_hex_exterior_radius = 3.6 + hole_tolerance;
 
 // 24mm button
 small_button_radius = 12 + hole_tolerance;
-
 // 30mm button
 big_button_radius = 15 + hole_tolerance;
+
+//24mm keycap = 25.2 hole
+24mm_keycap_hole_radius = (25.2/2);
 
 // JLF mount dimensions
 lever_mount_x = 53;

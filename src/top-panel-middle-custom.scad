@@ -145,8 +145,15 @@ module top_panel_middle_custom() {
        * yflip() translate([-48, -22, -10]) zflip()  
         import ("F:/Custom Controller/RP2040 Advanced Breakout Board - Version 5.stl");
     }
+    
+    tag("middle_panel_height_extension") {
+        down(switchPlateZ) intersection() {
+            middle_panel_with_raised_overhang();
+            down(5+2.5) cube([200, 200, switchPlateZ], anchor=BOTTOM);
+        }
+    }
 }
 
-*top_panel_middle_custom();
-top_panel_middle_switch_plate(references=false);
+top_panel_middle_custom();
+*top_panel_middle_switch_plate(references=false);
 
