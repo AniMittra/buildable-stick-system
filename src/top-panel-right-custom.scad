@@ -12,7 +12,7 @@ switchPlateZ=1.3;
 switchPlateMountOffset1=25;
 switchPlateMountOffset2=12.5;
 
-buttonsOffset=[-panel_x/2+(24/2)+12,-panel_y/2-(24/2)-24,0];
+buttonsOffset=[-panel_x/2+(24/2)+5,-panel_y/2-(24/2)-24,0];
 
 buttonPlacements = [
     //from psd
@@ -27,7 +27,7 @@ buttonPlacements = [
     [71.8+2, 132.1],
     [97.19+4, 120.19],
     // thumb
-    [10.1, 94.8],
+    [10.1+0.59, 94.8],
     [37.9, 104.69],
     // dual direction
     [30.79-5, 182.1+6],
@@ -149,5 +149,5 @@ module top_panel_right_custom() {
     }
 }
 
-top_panel_right_custom();
-*top_panel_right_switch_plate(references=false);
+*top_panel_right_custom();
+top_panel_right_switch_plate(references=false);

@@ -36,7 +36,7 @@ module left_frame() {
 		frame_cable_routing_hole();
 
 		// aux button holes
-        translate([frame_x/2, 0, 0]) button_24mm_hole();
+        translate([0, 0, 0]) button_24mm_hole();
 
 		//translate([-35, 101.5, 0]) rotate([270, 0, 0]) aux_control_three_button_cluster();
 		//translate([-35, (frame_y/2)-neutrik_panel_thickness-4, 0]) frame_cutout();

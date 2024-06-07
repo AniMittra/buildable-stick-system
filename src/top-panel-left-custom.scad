@@ -11,17 +11,17 @@ switchPlateDepth=-6.8;
 switchPlateMountOffset1=27.5;
 switchPlateMountOffset2=15.0;
 
-buttonsOffset=[-panel_x/2+(24/2)-12,-panel_y/2-(24/2)-24,0];
+buttonsOffset=[-panel_x/2-(24/2)+5+0.59+0.228,-panel_y/2-(24/2)-24,0];
 
 buttonPlacements = [    
     //from psd
     // directions
-    [88.8, 180.49],
-    [56.4, 155],
+    [88.8, 180.49+1],
+    [56.4-1, 155],
     [83.4, 154.69],
-    [108.4, 144.1],
+    [108.4+1, 144.1],
     // pinky
-    [30.99, 150.1],
+    [30.99-3, 150.1],
     // thumb
     [125.49, 94.8],
     [97.69, 104.69]
@@ -253,7 +253,7 @@ module top_panel_left_switch_plate_cutout() {
     }
 }
 
-top_panel_left_custom();
+*top_panel_left_custom();
 top_panel_left_switch_plate(references=false);
 *top_panel_left_switch_plate_cutout();
 
